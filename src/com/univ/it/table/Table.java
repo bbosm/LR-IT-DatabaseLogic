@@ -1,6 +1,7 @@
 package com.univ.it.table;
 
-import java.io.*;
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Table {
