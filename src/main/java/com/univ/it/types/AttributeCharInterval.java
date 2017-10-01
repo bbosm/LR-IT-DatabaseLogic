@@ -1,14 +1,16 @@
-package com.mbondarenko.univ;
+package com.univ.it.types;
 
-public class CharInterval {
+public class AttributeCharInterval extends Attribute {
     private char leftBorder, rightBorder;
 
-    public CharInterval(char leftBorder, char rightBorder) {
+    public AttributeCharInterval(char leftBorder, char rightBorder) {
+        super("");
         this.leftBorder = leftBorder;
         this.rightBorder = rightBorder;
     }
 
-    public CharInterval(String s) throws IllegalArgumentException {
+    public AttributeCharInterval(String s) throws IllegalArgumentException {
+        super(s);
         if (!checkValidity(s)) {
             throw new IllegalArgumentException("Not valid string");
         }
@@ -16,7 +18,7 @@ public class CharInterval {
         rightBorder = s.charAt(3);
     }
 
-    boolean checkValidity(String s) {
+    private boolean checkValidity(String s) {
         if (s.length() != 5) return false;
         if (s.charAt(0) != '[' || s.charAt(4) != ']' || s.charAt(2) != ':')
             return false;
