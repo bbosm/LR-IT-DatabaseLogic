@@ -41,8 +41,8 @@ public class AttributeTypesTest {
     @Test
     public void emptyTableFileOutIn() throws NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, IOException {
         ArrayList<Column> columns = new ArrayList<>();
-        columns.add(new Column("com.univ.it.types.AttributeDate"));
-        columns.add(new Column("com.univ.it.types.AttributeInteger"));
+        columns.add(new Column("Date", "com.univ.it.types.AttributeDate"));
+        columns.add(new Column("Date","com.univ.it.types.AttributeInteger"));
 
         Table table = new Table("testTable", columns);
         table.saveToFile("D:\\Temp");

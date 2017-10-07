@@ -12,6 +12,6 @@ Download & Install Intelij IDEA Community
 
 Intelij IDEA start window: Configure > Project Defaults > Project Structure - point SDK to JRE
 
-Import Project from build.gradle
 
-Point to gradle at (installation directory of Intelij IDEA)/plugins/gradle
+# Test
+Unit test with JUnit4 (https://www.youtube.com/watch?v=sKi203kavac)

@@ -18,7 +18,8 @@ public class Table {
         this.columns = columns;
     }
 
-    public Table(String pathToFile, String name) throws ClassNotFoundException,
+    public Table(String pathToFile, String name) throws
+            ClassNotFoundException,
             NoSuchMethodException,
             IllegalAccessException,
             InvocationTargetException,
@@ -35,22 +36,22 @@ public class Table {
 
             // second line
             columns = new ArrayList<>(columnsSize);
-            sCurrentLine = br.readLine();
-            String[] columnsClassNames = sCurrentLine.split("\\t");
             for (int columnId = 0; columnId < columnsSize; columnId++) {
-                columns.set(columnId, new Column(columnsClassNames[columnId]));
+                sCurrentLine = br.readLine();
+                String[] columnsFields = sCurrentLine.split("\\t");
+                columns.set(columnId, new Column(columnsFields[0], columnsFields[1]));
             }
 
             // other lines
             rows = new ArrayList<>(rowsSize);
             for (int rowId = 0; rowId < rowsSize; rowId++) {
                 sCurrentLine = br.readLine();
-                String[] fields = sCurrentLine.split("\\t");
+                String[] rowFields = sCurrentLine.split("\\t");
                 rows.set(rowId, new Row(rowId, columnsSize));
                 for (int columnId = 0; columnId < columnsSize; columnId++) {
                     Column column = columns.get(columnId);
                     getRow(rowId).set(columnId,
-                            (Attribute) column.getStringConstructor().newInstance(fields[columnId]));
+                            (Attribute) column.getStringConstructor().newInstance(rowFields[columnId]));
                 }
             }
         } catch (IOException e) {
@@ -60,8 +61,9 @@ public class Table {
 
     public Row addNewRow() {
         int id = rows.size();
-        rows.add(new Row(id, columns.size()));
-        return rows.get(id);
+        Row row = new Row(id, columns.size());
+        rows.add(row);
+        return row;
     }
 
     public void saveToFile(String pathToFile) throws IOException {
@@ -69,12 +71,10 @@ public class Table {
         try(PrintWriter out = new PrintWriter(fw)) {
             out.println(rows.size() + " " + columns.size());
 
-            StringBuilder columnsLine = new StringBuilder();
             for (Column column : columns) {
-                columnsLine.append(column.getClassName());
-                columnsLine.append("\t");
+                String columnString = column.toString();
+                out.println(columnString);
             }
-            out.println(columnsLine.toString());
 
             for (Row row : rows) {
                 String rowString = row.toString();
