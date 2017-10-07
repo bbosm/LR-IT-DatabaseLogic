@@ -1,4 +1,6 @@
-# LR-IT-DatabaseLogic
+# mydb
+Кузенко https://magistrs2016.github.io/
+
 
 
 

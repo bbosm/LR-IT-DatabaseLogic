@@ -3,9 +3,9 @@ package com.univ.it.types;
 public class AttributeId extends Attribute {
     private int id;
 
-    public AttributeId(int i) {
+    public AttributeId(int id) {
         super("");
-        id = i;
+        this.id = id;
     }
 
     public AttributeId(String s) {

@@ -2,6 +2,12 @@ package com.univ.it.types;
 
 public class AttributeChar extends Attribute {
     private char val;
+
+    public AttributeChar(char val) {
+        super("");
+        this.val = val;
+    }
+
     public AttributeChar(String s) {
         super(s);
         val = s.charAt(0);

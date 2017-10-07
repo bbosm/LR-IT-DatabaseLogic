@@ -6,7 +6,12 @@ import java.util.Date;
 
 public class AttributeDate extends Attribute {
     private Date val;
-    static protected SimpleDateFormat dateToStr = new SimpleDateFormat("yyyy.MM.dd");
+    static public final SimpleDateFormat dateToStr = new SimpleDateFormat("yyyy.MM.dd");
+
+    public AttributeDate(Date val) {
+        super("");
+        this.val = val;
+    }
 
     public AttributeDate(String s) throws ParseException {
         super(s);
