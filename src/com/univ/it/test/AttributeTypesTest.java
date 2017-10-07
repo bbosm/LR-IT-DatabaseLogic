@@ -1,17 +1,13 @@
 package com.univ.it.test;
 
-import com.univ.it.table.Column;
-import com.univ.it.table.Table;
-import com.univ.it.types.*;
+import com.univ.it.db.Column;
+import com.univ.it.db.Table;
+import com.univ.it.dbtype.*;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
 import java.util.ArrayList;
-
-import static jdk.nashorn.internal.runtime.PrototypeObject.getConstructor;
 
 public class AttributeTypesTest {
 
@@ -41,10 +37,10 @@ public class AttributeTypesTest {
     @Test
     public void emptyTableFileOutIn() throws NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, IOException {
         ArrayList<Column> columns = new ArrayList<>();
-        columns.add(new Column("Date", "com.univ.it.types.AttributeDate"));
-        columns.add(new Column("Date","com.univ.it.types.AttributeInteger"));
+        columns.add(new Column("Date", "com.univ.it.dbtype.AttributeDate"));
+        columns.add(new Column("Date","com.univ.it.dbtype.AttributeInteger"));
 
-        Table table = new Table("testTable", columns);
+        Table table = new Table(new DBTypeId(0), "testTable", columns);
         table.saveToFile("D:\\Temp");
     }
 }

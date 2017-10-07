@@ -1,4 +1,4 @@
-package com.univ.it.types;
+package com.univ.it.dbtype;
 
 public class AttributeChar extends Attribute {
     private char val;

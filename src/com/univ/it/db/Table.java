@@ -1,18 +1,20 @@
-package com.univ.it.table;
+package com.univ.it.db;
 
-import com.univ.it.types.Attribute;
+import com.univ.it.dbtype.Attribute;
+import com.univ.it.dbtype.DBTypeId;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class Table {
+    private DBTypeId id;
     private String name;
     private ArrayList<Row> rows;
     private ArrayList<Column> columns;
 
-    public Table(String name, ArrayList<Column> columns) {
+    public Table(DBTypeId id, String name, ArrayList<Column> columns) {
+        this.id = id;
         this.name = name;
         this.rows = new ArrayList<>();
         this.columns = columns;
@@ -47,23 +49,23 @@ public class Table {
             for (int rowId = 0; rowId < rowsSize; rowId++) {
                 sCurrentLine = br.readLine();
                 String[] rowFields = sCurrentLine.split("\\t");
-                rows.set(rowId, new Row(rowId, columnsSize));
+                ArrayList<Attribute> rowValues = new ArrayList<>(columnsSize);
                 for (int columnId = 0; columnId < columnsSize; columnId++) {
                     Column column = columns.get(columnId);
-                    getRow(rowId).set(columnId,
+                    rowValues.set(columnId,
                             (Attribute) column.getStringConstructor().newInstance(rowFields[columnId]));
                 }
+                rows.set(rowId, new Row(new DBTypeId(rowId), rowValues));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Row addNewRow() {
+    public void addRow(ArrayList<Attribute> values) {
         int id = rows.size();
-        Row row = new Row(id, columns.size());
+        Row row = new Row(new DBTypeId(id), values);
         rows.add(row);
-        return row;
     }
 
     public void saveToFile(String pathToFile) throws IOException {

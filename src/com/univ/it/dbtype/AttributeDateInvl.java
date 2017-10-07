@@ -1,4 +1,4 @@
-package com.univ.it.types;
+package com.univ.it.dbtype;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,6 +21,10 @@ public class AttributeDateInvl extends Attribute {
         String[] stringParameters = s.split("\\s+");
         left = dateToStr.parse(stringParameters[0]);
         right = dateToStr.parse(stringParameters[1]);
+    }
+
+    public boolean isInside(Date check) {
+        return !left.after(check) && !right.before(check);
     }
 
     @Override

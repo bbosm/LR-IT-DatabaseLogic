@@ -1,4 +1,4 @@
-package com.univ.it.types;
+package com.univ.it.dbtype;
 
 public class AttributeReal extends Attribute {
     private double val;

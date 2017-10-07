@@ -1,17 +1,17 @@
-package com.univ.it.table;
+package com.univ.it.db;
 
-import com.univ.it.types.Attribute;
-import com.univ.it.types.AttributeId;
+import com.univ.it.dbtype.Attribute;
+import com.univ.it.dbtype.DBTypeId;
 
 import java.util.ArrayList;
 
 public class Row {
+    private DBTypeId id;
     private ArrayList<Attribute> values;
-    private AttributeId id;
 
-    public Row(int id, int columns) {
-        this.id = new AttributeId(id);
-        values = new ArrayList<>(columns);
+    public Row(DBTypeId id, ArrayList<Attribute> values) {
+        this.id = id;
+        this.values = values;
     }
 
     public void set(int ind, Attribute newValue) {
@@ -26,7 +26,7 @@ public class Row {
 
     public int getId() { return id.getId(); }
 
-    public void setId(int id) { this.id = new AttributeId(id); }
+    public void setId(int id) { this.id = new DBTypeId(id); }
 
     @Override
     public String toString() {

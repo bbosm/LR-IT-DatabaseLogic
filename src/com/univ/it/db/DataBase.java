@@ -1,10 +1,5 @@
 package com.univ.it.db;
 
-import com.univ.it.table.Column;
-import com.univ.it.table.Row;
-import com.univ.it.table.Table;
-import com.univ.it.types.Attribute;
-
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

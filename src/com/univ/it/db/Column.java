@@ -1,4 +1,4 @@
-package com.univ.it.table;
+package com.univ.it.db;
 
 import java.lang.reflect.Constructor;
 

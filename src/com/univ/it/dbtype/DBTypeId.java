@@ -1,15 +1,13 @@
-package com.univ.it.types;
+package com.univ.it.dbtype;
 
-public class AttributeId extends Attribute {
+public class DBTypeId {
     private int id;
 
-    public AttributeId(int id) {
-        super("");
+    public DBTypeId(int id) {
         this.id = id;
     }
 
-    public AttributeId(String s) {
-        super(s);
+    public DBTypeId(String s) {
         id = Integer.parseInt(s);
     }
 
