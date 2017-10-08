@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 public class AttributeTypesTest {
@@ -30,7 +31,17 @@ public class AttributeTypesTest {
     }
 
     // AttributeDate
-    // TODO
+    @Test(expected = ParseException.class)
+    public void dateEmptyString() throws ParseException {
+        Attribute a = new AttributeDate("");
+    }
+
+    // AttributeDateInvl
+    @Test(expected = ParseException.class)
+    public void dateInvlEmptyString() throws ParseException {
+        Attribute a = new AttributeDateInvl("");
+    }
+
 
 
     // Table
