@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/mydb.iml" filepath="$PROJECT_DIR$/mydb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DatabaseLogic.iml" filepath="$PROJECT_DIR$/.idea/modules/DatabaseLogic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DatabaseLogic_main.iml" filepath="$PROJECT_DIR$/.idea/modules/DatabaseLogic_main.iml" group="DatabaseLogic" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DatabaseLogic_test.iml" filepath="$PROJECT_DIR$/.idea/modules/DatabaseLogic_test.iml" group="DatabaseLogic" />
     </modules>
   </component>
 </project>
