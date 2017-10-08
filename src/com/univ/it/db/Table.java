@@ -14,6 +14,7 @@ public class Table {
     private String name;
     private ArrayList<Row> rows;
     private ArrayList<Column> columns;
+    private boolean columnsInitialized = false;
 
     public Table(DBTypeId id, String name, ArrayList<Column> columns) {
         this.id = id;
@@ -26,6 +27,13 @@ public class Table {
         this.name = name;
         rows = new ArrayList<>();
         columns = new ArrayList<>();
+    }
+
+    public Table(String name, ArrayList<Column> columns) {
+        this.name = name;
+        this.columns = columns;
+        columnsInitialized = true;
+        rows = new ArrayList<>();
     }
 
     public Table(String pathToFile, String name) throws
@@ -70,6 +78,12 @@ public class Table {
         }
     }
 
+    public void replaceAt(int row, int col, String newValue) throws Exception {
+        Column column = columns.get(col);
+        Attribute newAttribute = column.createAttribute(newValue);
+        rows.get(row).replaceAt(col, newAttribute);
+    }
+
     public int columnNumber() {
         return columns.size();
     }
@@ -86,6 +100,39 @@ public class Table {
         int id = rows.size();
         Row row = new Row(new DBTypeId(id), values);
         rows.add(row);
+    }
+
+    private boolean checkTypes(Row row) {
+        Row firstRow = rows.get(0);
+        if (firstRow.size() != row.size()) {
+            return false;
+        }
+        for (int i = 0; i < row.size(); ++i) {
+            if (!row.getAt(i).getClass().equals(firstRow.getAt(i).getClass())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private ArrayList<Column> deduceTypes(Row row) {
+        ArrayList<Column> deducedTypes = new ArrayList<>();
+        for (int i = 0; i < row.size(); ++i) {
+            deducedTypes.add(new Column(row.getAt(i).getClass()));
+        }
+        return deducedTypes;
+    }
+
+    public void addNewRow(Row newRow) throws Exception {
+        if (!columnsInitialized) {
+            columns = deduceTypes(newRow);
+            columnsInitialized = true;
+        } else {
+            if (!checkTypes(newRow)) {
+                throw new Exception("Types are incompatible");
+            }
+        }
+        rows.add(newRow);
     }
 
     public void saveToFile(String pathToFile) throws IOException {
@@ -163,5 +210,34 @@ public class Table {
 
     public ArrayList<Column> getColumns() {
         return columns;
+    }
+
+    public static Table differenceBetween(Table table1, Table table2) {
+        Table difference = new Table("Difference");
+        if (table1.columns.size() != table2.columns.size()) {
+            return difference;
+        }
+        for (int i = 0; i < table1.columns.size(); ++i) {
+            if (!table1.columns.get(i).equals(table2.columns.get(i))) {
+                return difference;
+            }
+        }
+        for (int firstTableRow = 0; firstTableRow < table1.size(); ++firstTableRow) {
+            boolean isInSecond = false;
+            for (int secondTableRow = 0; secondTableRow < table2.size(); ++secondTableRow) {
+                if (table1.rows.get(firstTableRow).equals(table2.rows.get(secondTableRow))) {
+                    isInSecond = true;
+                    break;
+                }
+            }
+            if (!isInSecond) {
+                try {
+                    difference.addNewRow(table1.getRow(firstTableRow));
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+        }
+        return difference;
     }
 }

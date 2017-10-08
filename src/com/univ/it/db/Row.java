@@ -30,6 +30,10 @@ public class Row {
         return values.get(ind);
     }
 
+    public void replaceAt(int ind, Attribute newValue) {
+        values.set(ind, newValue);
+    }
+
     public String get(int ind) {
         return values.get(ind).toString();
     }

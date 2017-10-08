@@ -2,6 +2,8 @@ package com.univ.it.db;
 
 import java.lang.reflect.Constructor;
 
+import com.univ.it.dbtype.Attribute;
+
 public class Column {
     private String name;
     private String className;
@@ -17,6 +19,17 @@ public class Column {
         this.attributeConstructor = attributeType.getConstructor(String.class);
     }
 
+    public Column(Class c) {
+        attributeType = c;
+        String s = attributeType.getCanonicalName();
+        name = s.substring(s.lastIndexOf(".") + 1);
+        try {
+            attributeConstructor = attributeType.getConstructor();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
     public Column(String s) {
         try {
             name = s.substring(s.lastIndexOf(".") + 1);
@@ -25,6 +38,10 @@ public class Column {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public Attribute createAttribute(String attrString) throws Exception {
+        return (Attribute) attributeConstructor.newInstance(attrString);
     }
 
     private Constructor findStringConstructor(Class c) throws NoSuchMethodException {

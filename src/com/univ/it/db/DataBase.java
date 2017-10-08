@@ -67,6 +67,14 @@ public class DataBase {
         }
     }
 
+    public boolean dropTable(String tableName) {
+        return (null != tables.remove(tableName));
+    }
+
+    public Table getTable(String tableName) {
+        return tables.get(tableName);
+    }
+
     public static DataBase readFromFile(String dbFile) throws Exception {
         String dbName = Paths.get(dbFile).getFileName().toString();
         String dpPath = Paths.get(dbFile).getParent().toString();
