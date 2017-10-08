@@ -144,6 +144,14 @@ public class Table {
         return result;
     }
 
+    public Row getRow(int ind) {
+        if (ind >= rows.size()) {
+            throw new IndexOutOfBoundsException("Table has no such row");
+        } else {
+            return rows.get(ind);
+        }
+    }
+
     
     public String getName() {
         return name;
