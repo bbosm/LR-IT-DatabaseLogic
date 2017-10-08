@@ -144,7 +144,16 @@ public class Table {
         return result;
     }
 
-    public String getName() { return name; }
+    
+    public String getName() {
+        return name;
+    }
 
-    public Row getRow(int id) { return rows.get(id); }
+    public ArrayList<Row> getRows() {
+        return rows;
+    }
+
+    public ArrayList<Column> getColumns() {
+        return columns;
+    }
 }
