@@ -9,13 +9,25 @@ public class Row {
     private DBTypeId id;
     private ArrayList<Attribute> values;
 
+    public Row() {
+        values = new ArrayList<>();
+    }
+
     public Row(DBTypeId id, ArrayList<Attribute> values) {
         this.id = id;
         this.values = values;
     }
 
+    public void pushBack(Attribute a) {
+        values.add(a);
+    }
+
     public void set(int ind, Attribute newValue) {
         values.set(ind, newValue);
+    }
+
+    public Attribute getAt(int ind) {
+        return values.get(ind);
     }
 
     public String get(int ind) {

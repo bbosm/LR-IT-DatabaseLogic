@@ -6,6 +6,8 @@ import com.univ.it.dbtype.DBTypeId;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.nio.file.Paths;
+import java.lang.reflect.Constructor;
 
 public class Table {
     private DBTypeId id;
@@ -18,6 +20,12 @@ public class Table {
         this.name = name;
         this.rows = new ArrayList<>();
         this.columns = columns;
+    }
+
+    public Table(String name) {
+        this.name = name;
+        rows = new ArrayList<>();
+        columns = new ArrayList<>();
     }
 
     public Table(String pathToFile, String name) throws
@@ -53,13 +61,25 @@ public class Table {
                 for (int columnId = 0; columnId < columnsSize; columnId++) {
                     Column column = columns.get(columnId);
                     rowValues.set(columnId,
-                            (Attribute) column.getStringConstructor().newInstance(rowFields[columnId]));
+                            (Attribute) column.getAttributeConstructor().newInstance(rowFields[columnId]));
                 }
                 rows.set(rowId, new Row(new DBTypeId(rowId), rowValues));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public int columnNumber() {
+        return columns.size();
+    }
+
+    public Column getColumn(int ind) {
+        return columns.get(ind);
+    }
+
+    public int size() {
+        return rows.size();
     }
 
     public void addRow(ArrayList<Attribute> values) {
@@ -86,6 +106,42 @@ public class Table {
         catch (Exception e) {
             System.out.println(e.toString());
         }
+    }
+
+    public static Table readFromFile(String file) throws Exception {
+        Table result = new Table(Paths.get(file).getFileName().toString());
+        FileReader fr = new FileReader(file);
+        BufferedReader br = new BufferedReader(fr);
+
+        String sCurrentLine;
+        boolean firstLine = true;
+        int columnNumber = 0;
+
+        while ((sCurrentLine = br.readLine()) != null) {
+            if (firstLine) {
+                firstLine = false;
+                String[] columnNames = sCurrentLine.split("\t");
+                columnNumber = columnNames.length;
+                for (String columnName : columnNames) {
+                    result.columns.add(new Column(columnName));
+                }
+            } else {
+                String[] row = sCurrentLine.split("\t");
+                if (columnNumber != row.length) {
+                    throw new Exception("Invalid file");
+                }
+                Row newRow = new Row();
+                int i = 0;
+                for (String stringAttribute : row) {
+                    Constructor attributeConstructor = result.columns.get(i).getAttributeConstructor();
+                    Attribute attribute = (Attribute) attributeConstructor.newInstance(stringAttribute);
+                    newRow.pushBack(attribute);
+                    ++i;
+                }
+                result.rows.add(newRow);
+            }
+        }
+        return result;
     }
 
     public String getName() { return name; }
