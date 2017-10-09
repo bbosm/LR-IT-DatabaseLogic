@@ -46,12 +46,34 @@ public class AttributeTypesTest {
 
     // Table
     @Test
-    public void emptyTableFileOutIn() throws NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, IOException {
+    public void tableFileOutIn() throws
+            NoSuchMethodException,
+            ClassNotFoundException,
+            IllegalAccessException,
+            InstantiationException,
+            InvocationTargetException,
+            IOException,
+            ParseException {
+        String pathToTable = "C:\\Temp\\bd.db";
+
         ArrayList<Column> columns = new ArrayList<>();
         columns.add(new Column("Date", "com.univ.it.dbtype.AttributeDate"));
-        columns.add(new Column("Date","com.univ.it.dbtype.AttributeInteger"));
+        columns.add(new Column("Int","com.univ.it.dbtype.AttributeInteger"));
 
-        Table table = new Table(new DBTypeId(0), "testTable", columns);
-        table.saveToFile("D:\\Temp");
+        Table table = new Table(pathToTable, "testTable", columns);
+
+        ArrayList<Attribute> row = new ArrayList<>();
+        row.add(new AttributeDate("2017.10.9"));
+        row.add(new AttributeInteger(3));
+        table.addRow(row);
+        row = new ArrayList<>();
+        row.add(new AttributeDate("2017.10.13"));
+        row.add(new AttributeInteger(6));
+        table.addRow(row);
+
+        table.saveToFile();
+
+        Table table2 = new Table(pathToTable);
+        table2.saveToFile();
     }
 }

@@ -1,16 +1,13 @@
 package com.univ.it.db;
 
 import com.univ.it.dbtype.Attribute;
-import com.univ.it.dbtype.DBTypeId;
 
 import java.util.ArrayList;
 
 public class Row {
-    private DBTypeId id;
     private ArrayList<Attribute> values;
 
-    public Row(DBTypeId id, ArrayList<Attribute> values) {
-        this.id = id;
+    public Row(ArrayList<Attribute> values) {
         this.values = values;
     }
 
@@ -18,23 +15,15 @@ public class Row {
         values.set(ind, newValue);
     }
 
-    public String get(int ind) {
-        return values.get(ind).toString();
+    public Attribute get(int ind) {
+        return values.get(ind);
     }
 
     public int size() { return values.size(); }
 
-    public int getId() { return id.getId(); }
-
-    public void setId(int id) { this.id = new DBTypeId(id); }
-
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-
-        result.append(id);
-        result.append("\t");
-
         for (Attribute attribute : values) {
             result.append(attribute.toString());
             result.append("\t");

@@ -22,6 +22,10 @@ public class Column {
         return name + '\t' + className;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String getTypeName() { return typeName; }
 
     public Class getAttributeType() { return attributeType; }

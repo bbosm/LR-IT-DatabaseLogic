@@ -5,30 +5,31 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class DataBase {
+    private String pathToFile;
     private String name;
     private ArrayList<Table> tables;
 
-    public DataBase(String name, ArrayList<Table> tables) {
+    public DataBase(String pathToFile, String name, ArrayList<Table> tables) {
+        this.pathToFile = pathToFile;
         this.name = name;
         this.tables = tables;
     }
 
-    public DataBase(String pathToFile, String name) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        this.name = name;
-        try (BufferedReader br = new BufferedReader(new FileReader(pathToFile + File.separator + name + ".db"))) {
-            this.name = name;
+    public DataBase(String pathToFile) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        this.pathToFile = pathToFile;
 
+        try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
             // first line
-            int tablesSize = 0;
-            String sCurrentLine = br.readLine();
-            tablesSize = Integer.parseInt(sCurrentLine);
+            this.name = br.readLine();
 
             // second line
+            int tablesSize = Integer.parseInt(br.readLine());
+
+            // other lines
             tables = new ArrayList<>(tablesSize);
-            sCurrentLine = br.readLine();
-            String[] tablesClassNames = sCurrentLine.split("\\t");
             for (int tableId = 0; tableId < tablesSize; tableId++) {
-                tables.set(tableId, new Table(pathToFile, tablesClassNames[tableId]));
+                String tableFilePath = br.readLine();
+                tables.add(new Table(tableFilePath));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -36,19 +37,39 @@ public class DataBase {
     }
 
     public void saveToFile(String pathToFile) throws IOException {
-        FileWriter fw = new FileWriter(pathToFile + File.separator + name + ".db");
-        try(PrintWriter out = new PrintWriter(fw)){
+        this.pathToFile = pathToFile;
+
+        FileWriter fw = new FileWriter(pathToFile);
+        try(PrintWriter out = new PrintWriter(fw)) {
+            // first line
+            out.println(name);
+
+            // second line
             out.println(tables.size());
 
-            StringBuilder tablesLine = new StringBuilder();
+            // table lines
             for (Table table : tables) {
-                tablesLine.append(table.getName());
-                tablesLine.append("\t");
+                out.println(table.getPathToFile());
             }
-            out.println(tablesLine.toString());
         }
         catch (Exception e) {
             System.out.println(e.toString());
         }
+    }
+
+    public void saveToFile() throws IOException {
+        saveToFile(this.pathToFile);
+    }
+
+    public String getPathForTables() {
+        return pathToFile.substring(0, pathToFile.lastIndexOf(File.separatorChar));
+    }
+
+    public String getPathToFile() {
+        return pathToFile;
+    }
+
+    public ArrayList<Table> getTables() {
+        return tables;
     }
 }
