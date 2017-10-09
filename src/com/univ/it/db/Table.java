@@ -63,6 +63,14 @@ public class Table {
         }
     }
 
+    public void constructField(int rowNumber, int columnNumber, String s) throws
+            IllegalAccessException,
+            InvocationTargetException,
+            InstantiationException {
+        rows.get(rowNumber).set(columnNumber,
+                (Attribute) columns.get(columnNumber).getStringConstructor().newInstance(s));
+    }
+
     public void addRow(ArrayList<Attribute> values) {
         // TODO: check if values types are as column types
         Row row = new Row(values);

@@ -83,17 +83,11 @@ public class MainWindow extends Application {
 
         MenuItem newTableMenuItem = new MenuItem("New Table");
         newTableMenuItem.setOnAction(t -> createTable());
-//        MenuItem dropTableMenuItem = new MenuItem("Drop Table");
-//        dropTableMenuItem.setOnAction(t -> dropTable());
         MenuItem addNewRowTableMenuItem = new MenuItem("Add New Row");
         addNewRowTableMenuItem.setOnAction(t -> addNewRowTable());
-//        MenuItem calculateDifferenceMenuItem = new MenuItem("Calculate Difference");
-//        calculateDifferenceMenuItem.setOnAction(t -> calculateDifference());
         menuTable.getItems().addAll(
                 newTableMenuItem,
-//                dropTableMenuItem,
                 addNewRowTableMenuItem
-//                calculateDifferenceMenuItem
         );
 
         MenuItem helpMenuItem = new MenuItem("About");
@@ -105,7 +99,7 @@ public class MainWindow extends Application {
     }
 
     private void createDb() {
-        Label secondLabel = new Label("Name of data base");
+        Label secondLabel = new Label("filePath to data base");
         TextField dbNameTextField = new TextField();
         Button createButton = new Button("Create");
 
@@ -186,7 +180,7 @@ public class MainWindow extends Application {
                     break;
                 } else {
                     try {
-                        columns.add(new Column("ColumnName", "com.univ.it.dbtype.Attribute" + _comboBox.getValue().toString()));
+                        columns.add(new Column(_comboBox.getValue().toString(), "com.univ.it.dbtype.Attribute" + _comboBox.getValue().toString()));
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -286,8 +280,7 @@ public class MainWindow extends Application {
                     (EventHandler<TableColumn.CellEditEvent<ObservableList, String>>) t -> {
                         String newValue = t.getNewValue();
                         try {
-                            table.getRows().get(t.getTablePosition().getRow()).set(j,
-                                    (Attribute) table.getColumns().get(j).getStringConstructor().newInstance(newValue));
+                            table.constructField(t.getTablePosition().getRow(), j, newValue);
                         } catch (Exception e) {
                             showErrorMessage(e.toString());
                         }
@@ -306,16 +299,6 @@ public class MainWindow extends Application {
         tableView.setEditable(true);
         tableView.setItems(data);
     }
-
-//    private void dropTable() {
-//        Tab tab = tabPane.getSelectionModel().getSelectedItem();
-//        String tabName = tab.getText();
-//        if (!currentDB.dropTable(tabName)) {
-//            showErrorMessage("Error occurred");
-//        }
-//        closeAllTabs();
-//        showDataBase();
-//    }
 
     private void addNewRowTable() {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
@@ -378,56 +361,6 @@ public class MainWindow extends Application {
 
         newWindow.show();
     }
-
-//    @SuppressWarnings("unchecked")
-//    private void calculateDifference() {
-//        Collection<String> allTableNames = currentDB.getTables().keySet();
-//
-//        Label firstTableLabel = new Label("First Table Name");
-//        ComboBox firstTableComboBox = new ComboBox();
-//        for (String tableName : allTableNames) {
-//            firstTableComboBox.getItems().add(tableName);
-//        }
-//
-//        Label secondTableLabel = new Label("First Table Name");
-//        ComboBox secondTableComboBox = new ComboBox();
-//        for (String tableName : allTableNames) {
-//            secondTableComboBox.getItems().add(tableName);
-//        }
-//
-//        HBox horizontalLayout1 = new HBox();
-//        horizontalLayout1.getChildren().addAll(firstTableLabel, firstTableComboBox);
-//
-//        HBox horizontalLayout2 = new HBox();
-//        horizontalLayout2.getChildren().addAll(secondTableLabel, secondTableComboBox);
-//
-//        Button calculateDifference = new Button("Calculate Difference");
-//
-//        VBox mainLayout = new VBox();
-//        mainLayout.getChildren().addAll(horizontalLayout1, horizontalLayout2, calculateDifference);
-//
-//        Scene secondScene = new Scene(mainLayout);
-//
-//        Stage newWindow = new Stage();
-//        newWindow.setTitle("About");
-//        newWindow.setScene(secondScene);
-//
-//        calculateDifference.setOnAction(e -> {
-//            if (firstTableComboBox.getValue() == null || secondTableComboBox.getValue() == null) {
-//                showErrorMessage("Choose table");
-//                return;
-//            }
-//            String firstTableName = firstTableComboBox.getValue().toString();
-//            String secondTableName = secondTableComboBox.getValue().toString();
-//            currentDB.addTable(Table.differenceBetween(currentDB.getTable(firstTableName),
-//                    currentDB.getTable(secondTableName)));
-//            newWindow.close();
-//            closeAllTabs();
-//            showDataBase();
-//        });
-//
-//        newWindow.show();
-//    }
 
     private void showTable(Table table) {
         Tab tab = new Tab();

@@ -1,6 +1,7 @@
 package com.univ.it.test;
 
 import com.univ.it.db.Column;
+import com.univ.it.db.ColumnEnum;
 import com.univ.it.db.Table;
 import com.univ.it.dbtype.*;
 import org.junit.Test;
@@ -54,7 +55,7 @@ public class AttributeTypesTest {
             InvocationTargetException,
             IOException,
             ParseException {
-        String pathToTable = "C:\\Temp\\bd.db";
+        String pathToTable = "D:\\Temp\\bd.db";
 
         ArrayList<Column> columns = new ArrayList<>();
         columns.add(new Column("Date", "com.univ.it.dbtype.AttributeDate"));
@@ -69,6 +70,45 @@ public class AttributeTypesTest {
         row = new ArrayList<>();
         row.add(new AttributeDate("2017.10.13"));
         row.add(new AttributeInteger(6));
+        table.addRow(row);
+
+        table.saveToFile();
+
+        Table table2 = new Table(pathToTable);
+        table2.saveToFile();
+    }
+
+    @Test
+    public void enumTest() throws
+            NoSuchMethodException,
+            ClassNotFoundException,
+            IllegalAccessException,
+            InstantiationException,
+            InvocationTargetException,
+            IOException,
+            ParseException {
+        String pathToTable = "D:\\Temp\\bd2.db";
+
+        ArrayList<String> colors = new ArrayList<>();
+        colors.add("Red");
+        colors.add("Yellow");
+
+        ArrayList<Column> columns = new ArrayList<>();
+        columns.add(new Column("Date", "com.univ.it.dbtype.AttributeDate"));
+        ColumnEnum ce = new ColumnEnum("Color","com.univ.it.dbtype.AttributeInteger", colors);
+        columns.add(ce);
+
+        Table table = new Table(pathToTable, "testTable", columns);
+
+        ArrayList<Attribute> row = new ArrayList<>();
+        row.add(new AttributeDate("2017.10.9"));
+        row.add(new AttributeEnum(0));
+        row.get(1).setColumnEnum(ce);
+        table.addRow(row);
+        row = new ArrayList<>();
+        row.add(new AttributeDate("2017.10.13"));
+        row.add(new AttributeEnum("1"));
+        row.get(1).setColumnEnum(ce);
         table.addRow(row);
 
         table.saveToFile();
