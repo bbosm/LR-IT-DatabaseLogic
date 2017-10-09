@@ -50,12 +50,7 @@ public class Controller {
         for (int i = 0; i < table.getColumns().size(); i++) {
             TableColumn tc = new TableColumn(table.getColumns().get(i).getTypeName());
             final int colNo = i;
-            tc.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<String[], String>, ObservableValue<String>>() {
-                @Override
-                public ObservableValue<String> call(TableColumn.CellDataFeatures<String[], String> p) {
-                    return new SimpleStringProperty((p.getValue()[colNo]));
-                }
-            });
+            tc.setCellValueFactory((Callback<TableColumn.CellDataFeatures<String[], String>, ObservableValue<String>>) p -> new SimpleStringProperty((p.getValue()[colNo])));
             tc.setPrefWidth(90);
             tableView.getColumns().add(tc);
         }
