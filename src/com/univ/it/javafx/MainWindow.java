@@ -24,8 +24,8 @@ import javafx.util.Callback;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainWindow extends Application {
     @Override
@@ -50,7 +50,7 @@ public class MainWindow extends Application {
             );
 
     private void initUI(Stage stage) {
-        currentDB = new DataBase("C:\\Temp\\bd.db", "New database", new ArrayList<>());
+        currentDB = new DataBase(tempDB, new HashMap<String, Table>());
 
         StackPane root = new StackPane();
         verticalLayout = new VBox();
@@ -122,7 +122,7 @@ public class MainWindow extends Application {
             if (!dbNameTextField.getText().equals("")) {
                 System.out.println(dbNameTextField.getText());
                 try {
-                    currentDB = new DataBase(tempDB, dbNameTextField.getText(), new ArrayList<>());
+                    currentDB = new DataBase(dbNameTextField.getText(), new HashMap<String, Table>());
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
@@ -173,7 +173,7 @@ public class MainWindow extends Application {
             HBox _columnCreationLayout = new HBox();
             ComboBox _comboBox = new ComboBox(availableOptions);
             comboBoxes.add(_comboBox);
-            _columnCreationLayout.getChildren().addAll(new Label("Column"), new ComboBox(availableOptions));
+            _columnCreationLayout.getChildren().addAll(new Label("Column"), _comboBox);
             _verticalLayout.getChildren().add(_columnCreationLayout);
         });
 
@@ -200,7 +200,7 @@ public class MainWindow extends Application {
                 String tableName = tableNameTextField.getText();
                 String tableFilePath = currentDB.getPathForTables() + File.separator + tableName + ".db";
                 Table newTable = new Table(tableFilePath, tableName, columns);
-                currentDB.getTables().add(newTable);
+                currentDB.getTables().put(tableName, newTable);
                 newWindow.close();
                 showTable(newTable);
             } else {
@@ -230,24 +230,32 @@ public class MainWindow extends Application {
     }
 
     private void saveDb() {
-        Stage newWindow = new Stage();
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Open Database File");
-        File selectedDirectory = directoryChooser.showDialog(newWindow);
-        if (selectedDirectory != null) {
-            try {
-                currentDB.saveToFile(selectedDirectory.getAbsolutePath());
-            } catch (Exception e) {
-                showErrorMessage(e.toString());
+        if (currentDB.getPathToFile().equals(tempDB)) {
+            Stage newWindow = new Stage();
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Open Database File");
+            File selectedDirectory = directoryChooser.showDialog(newWindow);
+            if (selectedDirectory != null) {
+                try {
+                    currentDB.saveToFile(selectedDirectory.getAbsolutePath());
+                } catch (Exception e) {
+                    showErrorMessage(e.toString());
+                }
+            } else {
+                showErrorMessage("Choose file");
             }
-        } else {
-            showErrorMessage("Choose file");
         }
+        else
+            try {
+                currentDB.saveToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
     private void showDataBase() {
         HashMap<String, Table> tables = new HashMap<>();
-        for (Table table : currentDB.getTables()) {
+        for (Table table : currentDB.getTables().values()) {
             tables.put(table.getName(), table);
         }
 
@@ -313,7 +321,7 @@ public class MainWindow extends Application {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
         String tableName = tab.getText();
         HashMap<String, Table> tables = new HashMap<>();
-        for (Table table : currentDB.getTables()) {
+        for (Table table : currentDB.getTables().values()) {
             tables.put(table.getName(), table);
         }
         Table table = tables.get(tableName);

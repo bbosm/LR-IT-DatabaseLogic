@@ -2,34 +2,35 @@ package com.univ.it.db;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class DataBase {
     private String pathToFile;
-    private String name;
-    private ArrayList<Table> tables;
+    private HashMap<String, Table> tables;
 
-    public DataBase(String pathToFile, String name, ArrayList<Table> tables) {
+    public DataBase(String pathToFile, HashMap<String, Table> tables) {
         this.pathToFile = pathToFile;
-        this.name = name;
         this.tables = tables;
     }
 
-    public DataBase(String pathToFile) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public DataBase(String pathToFile) throws
+            ClassNotFoundException,
+            NoSuchMethodException,
+            InvocationTargetException,
+            InstantiationException,
+            IllegalAccessException {
         this.pathToFile = pathToFile;
 
         try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
             // first line
-            this.name = br.readLine();
-
-            // second line
             int tablesSize = Integer.parseInt(br.readLine());
 
             // other lines
-            tables = new ArrayList<>(tablesSize);
+            tables = new HashMap<String, Table>(tablesSize);
             for (int tableId = 0; tableId < tablesSize; tableId++) {
                 String tableFilePath = br.readLine();
-                tables.add(new Table(tableFilePath));
+                Table table = new Table(tableFilePath);
+                tables.put(table.getName(), table);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -41,15 +42,13 @@ public class DataBase {
 
         FileWriter fw = new FileWriter(pathToFile);
         try(PrintWriter out = new PrintWriter(fw)) {
-            // first line
-            out.println(name);
-
-            // second line
+            // firat line
             out.println(tables.size());
 
             // table lines
-            for (Table table : tables) {
+            for (Table table : tables.values()) {
                 out.println(table.getPathToFile());
+                table.saveToFile();
             }
         }
         catch (Exception e) {
@@ -69,7 +68,7 @@ public class DataBase {
         return pathToFile;
     }
 
-    public ArrayList<Table> getTables() {
+    public HashMap<String, Table> getTables() {
         return tables;
     }
 }
