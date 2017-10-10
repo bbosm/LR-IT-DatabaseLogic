@@ -35,6 +35,7 @@ public class MainWindow extends Application {
 
     private VBox verticalLayout;
     private DataBase currentDB;
+    private Table currTable;
     private TabPane tabPane;
 
     private final String tempTable = "C:\\Temp\\tb.db";
@@ -86,13 +87,40 @@ public class MainWindow extends Application {
         newTableMenuItem.setOnAction(t -> createTable());
         MenuItem addNewRowTableMenuItem = new MenuItem("Add New Row");
         addNewRowTableMenuItem.setOnAction(t -> addNewRowTable());
+        MenuItem searchMenuItem = new MenuItem("Search");
+        searchMenuItem.setOnAction(t -> search());
         menuTable.getItems().addAll(
                 newTableMenuItem,
-                addNewRowTableMenuItem
+                addNewRowTableMenuItem,
+                searchMenuItem
         );
 
         menuBar.getMenus().addAll(menuFile, menuTable);
         verticalLayout.getChildren().add(menuBar);
+    }
+
+    private void search()
+    {
+        VBox mainLayout = new VBox();
+
+        HBox columnLayout = new HBox();
+
+        for (int i = 0; i < currTable.getColumns().size(); ++i)
+        {
+            VBox tmpLayout = new VBox();
+            String name = currTable.getColumns().get(i).getClassName();
+            tmpLayout.getChildren().addAll(new Label(name), new TextField());
+            columnLayout.getChildren().add(tmpLayout);
+        }
+
+        Button tmpButton = new Button("Search");
+
+        mainLayout.getChildren().addAll(columnLayout, tmpButton);
+
+        Stage tmpWindow = new Stage();
+        tmpWindow.setTitle("Search Window");
+        tmpWindow.setScene(new Scene(mainLayout));
+        tmpWindow.show();
     }
 
     private void createDb() {
@@ -216,6 +244,7 @@ public class MainWindow extends Application {
                 Table newTable = new Table(tableFilePath, tableName, columns);
                 currentDB.getTables().put(tableName, newTable);
                 newWindow.close();
+                currTable = newTable;
                 showTable(newTable);
             } else {
                 showErrorMessage("Empty table name");

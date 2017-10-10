@@ -32,5 +32,10 @@ public class Column {
         return name;
     }
 
+    public String getClassName()
+    {
+        return className.substring(className.lastIndexOf(".Attribute") + 10);
+    }
+
     public Constructor getStringConstructor() { return stringConstructor; }
 }
