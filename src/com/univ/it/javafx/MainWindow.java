@@ -1,9 +1,6 @@
 package com.univ.it.javafx;
 
-import com.univ.it.db.Column;
-import com.univ.it.db.DataBase;
-import com.univ.it.db.Row;
-import com.univ.it.db.Table;
+import com.univ.it.db.*;
 import com.univ.it.dbtype.Attribute;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
@@ -28,6 +25,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainWindow extends Application {
+
+    private ArrayList<Column> currColumns = new ArrayList<>();
+
     @Override
     public void start(Stage stage) {
         initUI(stage);
@@ -39,7 +39,7 @@ public class MainWindow extends Application {
     private TabPane tabPane;
 
     private final String tempTable = "C:\\Temp\\tb.db";
-    private final String tempDB = "C:\\Temp\\bd.db";
+    private final String tempDB = "/home/romashka/mydb/1.db";
 
     private final ObservableList<String> availableOptions =
             FXCollections.observableArrayList(
@@ -186,8 +186,60 @@ public class MainWindow extends Application {
         newWindow.show();
     }
 
+    private boolean addColumnToTable(Object className, String columnName)
+    {
+        if (className == null) {
+            showErrorMessage("Choose the type of the last column");
+            return false;
+        }
+        if (columnName.equals("")) {
+            showErrorMessage("Choose the name of the last column");
+            return false;
+        }
+        if (className.toString().equals("Enum")) {
+
+            VBox tmpLayout = new VBox();
+            Button createEnumButton = new Button("Create Enum");
+            TextField enumValues = new TextField();
+            tmpLayout.getChildren().addAll(new Label("Enter space-separated values"), enumValues, createEnumButton);
+            Stage tmpWindow = new Stage();
+            tmpWindow.setTitle("Enum Values");
+            tmpWindow.setScene(new Scene(tmpLayout));
+            tmpWindow.show();
+
+            createEnumButton.setOnAction(r -> {
+                try {
+                    String[] enumVals = enumValues.getText().split("\\s+");
+                    ArrayList<String> vals = new ArrayList<>();
+
+                    for (int i = 0; i < enumVals.length; ++i) {
+                        vals.add(enumVals[i]);
+                    }
+
+                    currColumns.add(new ColumnEnum(columnName,"com.univ.it.dbtype.AttributeEnum", vals));
+                    tmpWindow.close();
+                }
+                catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            });
+        }
+        else
+        {
+            try {
+                currColumns.add(new Column(columnName, "com.univ.it.dbtype.Attribute" + className.toString()));
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+        return true;
+    }
+
     @SuppressWarnings("unchecked")
     private void createTable() {
+        currColumns.clear();
+
         Label secondLabel = new Label("Name of table");
         TextField tableNameTextField = new TextField();
 
@@ -222,62 +274,38 @@ public class MainWindow extends Application {
         columnCreationLayout.getChildren().addAll(new Label("Column"), comboBox, columnNameTextField);
         _verticalLayout.getChildren().add(columnCreationLayout);
 
+
         addNewColumnButton.setOnAction(e -> {
             int curr = comboBoxes.size() - 1;
-            if (comboBoxes.get(curr).getValue() == null) {
-                showErrorMessage("Choose the type of the last column");
-                return;
-            }
-            if (textFields.get(curr).getText().equals("")) {
-                showErrorMessage("Choose the name of the last column");
-                return;
-            }
-            if (comboBoxes.get(curr).getValue() == "Enum") {
+            boolean isAdded = addColumnToTable(comboBoxes.get(curr).getValue(), textFields.get(curr).getText());
 
-                VBox tmpLayout = new VBox();
-                tmpLayout.getChildren().addAll(new Label("Enter space-separated values"), new TextField(), new Button("Create Enum"));
-                Stage tmpWindow = new Stage();
-                tmpWindow.setTitle("Enum Values");
-                tmpWindow.setScene(new Scene(tmpLayout));
-                tmpWindow.show();
+            if (isAdded) {
+                HBox _columnCreationLayout = new HBox();
+                ComboBox _comboBox = new ComboBox(availableOptions);
+                comboBoxes.add(_comboBox);
+                TextField _columnNameTextField = new TextField();
+                textFields.add(_columnNameTextField);
+                _columnCreationLayout.getChildren().addAll(new Label("Column"), _comboBox, _columnNameTextField);
+                _verticalLayout.getChildren().add(_columnCreationLayout);
             }
-            HBox _columnCreationLayout = new HBox();
-            ComboBox _comboBox = new ComboBox(availableOptions);
-            comboBoxes.add(_comboBox);
-            TextField _columnNameTextField = new TextField();
-            textFields.add(_columnNameTextField);
-            _columnCreationLayout.getChildren().addAll(new Label("Column"), _comboBox, _columnNameTextField);
-            _verticalLayout.getChildren().add(_columnCreationLayout);
         });
 
         createNewTableButton.setOnAction(e -> {
             int curr = comboBoxes.size() - 1;
-            if (comboBoxes.get(curr).getValue() == null) {
-                showErrorMessage("Choose the type of the last column");
-                return;
-            }
-            if (textFields.get(curr).getText().equals("")) {
-                showErrorMessage("Choose the name of the last column");
-                return;
-            }
-            ArrayList<Column> columns = new ArrayList<>();
-            for (int i = 0; i < comboBoxes.size(); ++i) {
-                try {
-                columns.add(new Column(textFields.get(i).getText(), "com.univ.it.dbtype.Attribute" + comboBoxes.get(i).getValue().toString()));
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-            }
-            if (!tableNameTextField.getText().equals("")) {
-                String tableName = tableNameTextField.getText();
-                String tableFilePath = currentDB.getPathForTables() + File.separator + tableName + ".db";
-                Table newTable = new Table(tableFilePath, tableName, columns);
-                currentDB.getTables().put(tableName, newTable);
-                newWindow.close();
-                currTable = newTable;
-                showTable(newTable);
-            } else {
-                showErrorMessage("Empty table name");
+            boolean isAdded = addColumnToTable(comboBoxes.get(curr).getValue(), textFields.get(curr).getText());
+
+            if (isAdded) {
+                if (!tableNameTextField.getText().equals("")) {
+                    String tableName = tableNameTextField.getText();
+                    String tableFilePath = currentDB.getPathForTables() + File.separator + tableName + ".db";
+                    Table newTable = new Table(tableFilePath, tableName, currColumns);
+                    currentDB.getTables().put(tableName, newTable);
+                    newWindow.close();
+                    currTable = newTable;
+                    showTable(newTable);
+                } else {
+                    showErrorMessage("Empty table name");
+                }
             }
         });
 
