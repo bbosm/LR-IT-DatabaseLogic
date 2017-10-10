@@ -11,16 +11,6 @@ public class Row {
         this.values = values;
     }
 
-    public void set(int ind, Attribute newValue) {
-        values.set(ind, newValue);
-    }
-
-    public Attribute get(int ind) {
-        return values.get(ind);
-    }
-
-    public int size() { return values.size(); }
-
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
@@ -29,6 +19,14 @@ public class Row {
             result.append("\t");
         }
         return result.toString();
+    }
+
+    public void set(int ind, Attribute newValue) {
+        values.set(ind, newValue);
+    }
+
+    public Attribute get(int ind) {
+        return values.get(ind);
     }
 
     public ArrayList<Attribute> getValues() {

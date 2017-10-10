@@ -38,6 +38,7 @@ public class MainWindow extends Application {
     private Table currTable;
     private TabPane tabPane;
 
+    // TODO: remove this
     private final String tempTable = "C:\\Temp\\tb.db";
     private final String tempDB = "C:\\Temp\\bd.db";
 
@@ -359,7 +360,7 @@ public class MainWindow extends Application {
                     (EventHandler<TableColumn.CellEditEvent<ObservableList, String>>) t -> {
                         String newValue = t.getNewValue();
                         try {
-                            table.constructField(t.getTablePosition().getRow(), j, newValue);
+                            table.setField(t.getTablePosition().getRow(), j, newValue);
                         } catch (Exception e) {
                             showErrorMessage(e.toString());
                         }
@@ -370,7 +371,7 @@ public class MainWindow extends Application {
 
         for (int i = 0; i < table.getRows().size(); i++) {
             ObservableList<String> row = FXCollections.observableArrayList();
-            for(int j = 0; j < table.getRows().get(i).size(); j++) {
+            for(int j = 0; j < table.getRows().get(i).getValues().size(); j++) {
                 row.add(table.getRows().get(i).get(j).toString());
             }
             data.add(row);

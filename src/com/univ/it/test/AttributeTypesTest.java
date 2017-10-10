@@ -104,7 +104,7 @@ public class AttributeTypesTest {
     }
 
     @Test
-    public void enumTest() throws
+    public void enumTableFileOutIn() throws
             NoSuchMethodException,
             ClassNotFoundException,
             IllegalAccessException,

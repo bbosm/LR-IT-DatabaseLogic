@@ -12,7 +12,7 @@ public class AttributeEnum extends Attribute {
     }
 
     public AttributeEnum(String s, ColumnEnum ce) {
-        super (s);
+        super(s);
         this.index = Integer.parseInt(s);
         this.ce = ce;
     }

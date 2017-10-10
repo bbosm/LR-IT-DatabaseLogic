@@ -57,31 +57,16 @@ public class Table {
                 ArrayList<Attribute> rowValues = new ArrayList<>(columnsSize);
                 for (int columnId = 0; columnId < columnsSize; columnId++) {
                     Column column = columns.get(columnId);
-                    if (column.getClassName().equals("com.univ.it.dbtype.AttributeEnum")) {
+                    if (column.getClassName().equals("Enum")) {
                         rowValues.add(new AttributeEnum(rowFields[columnId], (ColumnEnum) column));
                     } else {
-                        rowValues.add((Attribute) column.getStringConstructor().newInstance(rowFields[columnId]));
-                    }
+                        rowValues.add(constructField(columnId, rowFields[columnId]));                    }
                 }
                 rows.add(new Row(rowValues));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void constructField(int rowNumber, int columnNumber, String s) throws
-            IllegalAccessException,
-            InvocationTargetException,
-            InstantiationException {
-        rows.get(rowNumber).set(columnNumber,
-                (Attribute) columns.get(columnNumber).getStringConstructor().newInstance(s));
-    }
-
-    public void addRow(ArrayList<Attribute> values) {
-        // TODO: check if values types are as column types
-        Row row = new Row(values);
-        rows.add(row);
     }
 
     public void saveToFile(String pathToFile) throws IOException {
@@ -111,6 +96,26 @@ public class Table {
         catch (Exception e) {
             System.out.println(e.toString());
         }
+    }
+
+    public Attribute constructField(int columnNumber, String s) throws
+            IllegalAccessException,
+            InvocationTargetException,
+            InstantiationException {
+        return (Attribute) columns.get(columnNumber).getStringConstructor().newInstance(s);
+    }
+
+    public void setField(int rowNumber, int columnNumber, String s) throws
+            IllegalAccessException,
+            InvocationTargetException,
+            InstantiationException {
+        rows.get(rowNumber).set(columnNumber, constructField(columnNumber, s));
+    }
+
+    public void addRow(ArrayList<Attribute> values) {
+        // TODO: check if values types are as column types
+        Row row = new Row(values);
+        rows.add(row);
     }
 
     public void saveToFile() throws IOException {

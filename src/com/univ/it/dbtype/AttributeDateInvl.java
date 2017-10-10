@@ -9,12 +9,6 @@ public class AttributeDateInvl extends Attribute {
     private Date right;
     static private final SimpleDateFormat dateToStr = AttributeDate.dateToStr;
 
-    public AttributeDateInvl(Date left, Date right) {
-        super("");
-        this.left = left;
-        this.right = right;
-    }
-
     public AttributeDateInvl(String s) throws ParseException {
         super(s);
 
@@ -23,12 +17,12 @@ public class AttributeDateInvl extends Attribute {
         right = dateToStr.parse(stringParameters[1]);
     }
 
-    public boolean isInside(Date check) {
-        return !left.after(check) && !right.before(check);
-    }
-
     @Override
     public String toString() {
         return dateToStr.format(left) + " " + dateToStr.format(right);
+    }
+
+    public boolean isInside(Date check) {
+        return !left.after(check) && !right.before(check);
     }
 }
