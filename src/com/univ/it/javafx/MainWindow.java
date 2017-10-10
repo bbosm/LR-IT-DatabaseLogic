@@ -125,29 +125,11 @@ public class MainWindow extends Application {
         tmpWindow.show();
 
         tmpButton.setOnAction(e -> {
-            Table searchTable = new Table(null, currTable.getName(), currTable.getColumns());
-
-            for (int i = 0; i < currTable.getRows().size(); ++i)
-            {
-                boolean add = true;
-                Row tmpRow = currTable.getRows().get(i);
-                for (int j = 0; j < currTable.getColumns().size(); ++j)
-                {
-                    String tmpString = textFields.get(j).getText();
-                    if (!tmpString.equals(""))
-                    {
-                        if (!tmpRow.get(j).toString().equals(tmpString))
-                        {
-                            add = false;
-                            break;
-                        }
-                    }
-                }
-                if (add)
-                {
-                    searchTable.addRow(tmpRow.getValues());
-                }
+            ArrayList<String> fieldsSearch = new ArrayList<>(currTable.getColumns().size());
+            for (int j = 0; j < currTable.getColumns().size(); j++) {
+                fieldsSearch.add(textFields.get(j).getText());
             }
+            Table searchTable = currTable.search(fieldsSearch);
 
             tmpWindow.close();
             showTable(searchTable);

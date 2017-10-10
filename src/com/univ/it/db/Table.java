@@ -98,6 +98,32 @@ public class Table {
         }
     }
 
+    public Table search(ArrayList<String> fieldsSearch) {
+        Table result = new Table(null, "Search in " + getName(), getColumns());
+        for (int i = 0; i < getRows().size(); ++i)
+        {
+            boolean add = true;
+            Row tmpRow = getRows().get(i);
+            for (int j = 0; j < getColumns().size(); ++j)
+            {
+                String tmpString = fieldsSearch.get(j);
+                if (!tmpString.equals(""))
+                {
+                    if (!tmpRow.get(j).toString().equals(tmpString))
+                    {
+                        add = false;
+                        break;
+                    }
+                }
+            }
+            if (add)
+            {
+                result.addRow(tmpRow.getValues());
+            }
+        }
+        return result;
+    }
+
     public Attribute constructField(int columnNumber, String s) throws
             IllegalAccessException,
             InvocationTargetException,
