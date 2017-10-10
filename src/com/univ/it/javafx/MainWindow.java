@@ -158,7 +158,9 @@ public class MainWindow extends Application {
         ArrayList<ComboBox> comboBoxes = new ArrayList<>();
         ComboBox comboBox = new ComboBox(availableOptions);
         comboBoxes.add(comboBox);
+        ArrayList<TextField> textFields = new ArrayList<>();
         TextField columnNameTextField = new TextField();
+        textFields.add(columnNameTextField);
         columnCreationLayout.getChildren().addAll(new Label("Column"), comboBox, columnNameTextField);
         _verticalLayout.getChildren().add(columnCreationLayout);
 
@@ -166,6 +168,10 @@ public class MainWindow extends Application {
             int curr = comboBoxes.size() - 1;
             if (comboBoxes.get(curr).getValue() == null) {
                 showErrorMessage("Choose the type of the last column");
+                return;
+            }
+            if (textFields.get(curr).getText().equals("")) {
+                showErrorMessage("Choose the name of the last column");
                 return;
             }
             if (comboBoxes.get(curr).getValue() == "Enum") {
@@ -181,14 +187,25 @@ public class MainWindow extends Application {
             ComboBox _comboBox = new ComboBox(availableOptions);
             comboBoxes.add(_comboBox);
             TextField _columnNameTextField = new TextField();
+            textFields.add(_columnNameTextField);
             _columnCreationLayout.getChildren().addAll(new Label("Column"), _comboBox, _columnNameTextField);
             _verticalLayout.getChildren().add(_columnCreationLayout);
         });
 
         createNewTableButton.setOnAction(e -> {
+            int curr = comboBoxes.size() - 1;
+            if (comboBoxes.get(curr).getValue() == null) {
+                showErrorMessage("Choose the type of the last column");
+                return;
+            }
+            if (textFields.get(curr).getText().equals("")) {
+                showErrorMessage("Choose the name of the last column");
+                return;
+            }
             ArrayList<Column> columns = new ArrayList<>();
-            for (ComboBox _comboBox : comboBoxes) { try {
-                columns.add(new Column(_comboBox.getValue().toString(), "com.univ.it.dbtype.Attribute" + _comboBox.getValue().toString()));
+            for (int i = 0; i < comboBoxes.size(); ++i) {
+                try {
+                columns.add(new Column(textFields.get(i).getText(), "com.univ.it.dbtype.Attribute" + comboBoxes.get(i).getValue().toString()));
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
