@@ -101,26 +101,39 @@ public class MainWindow extends Application {
 
     private void search()
     {
-        VBox mainLayout = new VBox();
-
-        HBox columnLayout = new HBox();
+        /*HBox columnLayout = new HBox();
+        ArrayList<TextField> textFields = new ArrayList<>();
 
         for (int i = 0; i < currTable.getColumns().size(); ++i)
         {
             VBox tmpLayout = new VBox();
             String name = currTable.getColumns().get(i).getClassName();
+            textFields.add(new TextField());
             tmpLayout.getChildren().addAll(new Label(name), new TextField());
             columnLayout.getChildren().add(tmpLayout);
         }
 
         Button tmpButton = new Button("Search");
 
+        VBox mainLayout = new VBox();
         mainLayout.getChildren().addAll(columnLayout, tmpButton);
 
         Stage tmpWindow = new Stage();
         tmpWindow.setTitle("Search Window");
         tmpWindow.setScene(new Scene(mainLayout));
         tmpWindow.show();
+
+        tmpButton.setOnAction(e -> {
+            for (int i = 0; i < currTable.getRows().size(); ++i)
+            {
+                boolean add = true;
+                for (int j = 0; j < currTable.getColumns().size(); ++j)
+                {
+                    if (!)
+
+                }
+            }
+        });*/
     }
 
     private void createDb() {
