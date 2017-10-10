@@ -95,20 +95,18 @@ public class AttributeTypesTest {
 
         ArrayList<Column> columns = new ArrayList<>();
         columns.add(new Column("Date", "com.univ.it.dbtype.AttributeDate"));
-        ColumnEnum ce = new ColumnEnum("Color","com.univ.it.dbtype.AttributeInteger", colors);
+        ColumnEnum ce = new ColumnEnum("Color","com.univ.it.dbtype.AttributeEnum", colors);
         columns.add(ce);
 
         Table table = new Table(pathToTable, "testTable", columns);
 
         ArrayList<Attribute> row = new ArrayList<>();
         row.add(new AttributeDate("2017.10.9"));
-        row.add(new AttributeEnum(0));
-        row.get(1).setColumnEnum(ce);
+        row.add(new AttributeEnum("0", ce));
         table.addRow(row);
         row = new ArrayList<>();
         row.add(new AttributeDate("2017.10.13"));
-        row.add(new AttributeEnum("1"));
-        row.get(1).setColumnEnum(ce);
+        row.add(new AttributeEnum("1", ce));
         table.addRow(row);
 
         table.saveToFile();

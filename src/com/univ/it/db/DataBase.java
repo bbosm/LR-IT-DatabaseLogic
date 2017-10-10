@@ -26,7 +26,7 @@ public class DataBase {
             int tablesSize = Integer.parseInt(br.readLine());
 
             // other lines
-            tables = new HashMap<String, Table>(tablesSize);
+            tables = new HashMap<>(tablesSize);
             for (int tableId = 0; tableId < tablesSize; tableId++) {
                 String tableFilePath = br.readLine();
                 Table table = new Table(tableFilePath);

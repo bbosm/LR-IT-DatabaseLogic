@@ -16,7 +16,8 @@ public class ColumnEnum extends Column {
             NoSuchMethodException,
             ClassNotFoundException {
         super(s);
-        String columnsEnumValue = s.split("\\t")[2];
+        this.values = new ArrayList<>();
+        String columnsEnumValue = s.split("\\t")[3];
         String[] columnEnumValues = columnsEnumValue.split("\\s+");
         int enumSize = Integer.parseInt(columnEnumValues[0]);
         for (int i = 0; i < enumSize; i++) {
@@ -29,8 +30,8 @@ public class ColumnEnum extends Column {
         StringBuilder sb = new StringBuilder();
         sb.append(values.size());
         for(String val : values)
-            sb.append(' ' + val);
-        return super.toString() + '\t' + sb.toString();
+            sb.append(" " + val);
+        return "ColumnEnum" + '\t' + this.name + '\t' + this.className + '\t' + sb.toString();
     }
 
     public ArrayList<String> getValues() {

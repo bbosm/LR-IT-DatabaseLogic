@@ -1,6 +1,7 @@
 package com.univ.it.db;
 
 import com.univ.it.dbtype.Attribute;
+import com.univ.it.dbtype.AttributeEnum;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -42,8 +43,10 @@ public class Table {
             columns = new ArrayList<>(columnsSize);
             for (int columnId = 0; columnId < columnsSize; columnId++) {
                 sCurrentLine = br.readLine();
-                String[] columnsFields = sCurrentLine.split("\\t");
-                columns.add(new Column(columnsFields[0], columnsFields[1]));
+                if (sCurrentLine.split("\\t")[0].equals("ColumnEnum"))
+                    columns.add(new ColumnEnum(sCurrentLine));
+                else
+                    columns.add(new Column(sCurrentLine));
             }
 
             // row lines
@@ -54,7 +57,11 @@ public class Table {
                 ArrayList<Attribute> rowValues = new ArrayList<>(columnsSize);
                 for (int columnId = 0; columnId < columnsSize; columnId++) {
                     Column column = columns.get(columnId);
-                    rowValues.add((Attribute) column.getStringConstructor().newInstance(rowFields[columnId]));
+                    if (column.getClassName().equals("com.univ.it.dbtype.AttributeEnum")) {
+                        rowValues.add(new AttributeEnum(rowFields[columnId], (ColumnEnum) column));
+                    } else {
+                        rowValues.add((Attribute) column.getStringConstructor().newInstance(rowFields[columnId]));
+                    }
                 }
                 rows.add(new Row(rowValues));
             }
@@ -90,14 +97,14 @@ public class Table {
 
             // column lines
             for (Column column : columns) {
-                String columnString = column.toString();
-                out.println(columnString);
+                String columnLine = column.toString();
+                out.println(columnLine);
             }
 
             // row lines
             for (Row row : rows) {
-                String rowString = row.toString();
-                out.println(rowString);
+                String rowLine = row.toString();
+                out.println(rowLine);
             }
         }
         catch (Exception e) {

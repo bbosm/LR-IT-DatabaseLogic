@@ -25,7 +25,7 @@ public class Row {
     public String toString() {
         StringBuilder result = new StringBuilder();
         for (Attribute attribute : values) {
-            result.append(attribute.toString());
+            result.append(attribute.toFile());
             result.append("\t");
         }
         return result.toString();
