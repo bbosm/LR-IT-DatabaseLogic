@@ -42,11 +42,13 @@ public class MainWindow extends Application {
 
     private final ObservableList<String> availableOptions =
             FXCollections.observableArrayList(
-                    "Char",
-                    "Date",
-                    "DateInvl",
+
                     "Integer",
-                    "Real"
+                    "Real",
+                    "Char",
+                    "Enum",
+                            "Date",
+                            "DateInvl"
             );
 
     private void initUI(Stage stage) {
@@ -70,7 +72,6 @@ public class MainWindow extends Application {
     private void initializeMenuBar() {
         MenuBar menuBar = new MenuBar();
         Menu menuFile = new Menu("File");
-        Menu menuHelp = new Menu("Help");
         Menu menuTable = new Menu("Table");
 
         MenuItem newDbMenuItem = new MenuItem("New DB");
@@ -81,7 +82,7 @@ public class MainWindow extends Application {
         saveDbMenuItem.setOnAction(t -> saveDb());
         menuFile.getItems().addAll(newDbMenuItem, openDbMenuItem, saveDbMenuItem);
 
-        MenuItem newTableMenuItem = new MenuItem("New Table");
+        MenuItem newTableMenuItem = new MenuItem("Create Table");
         newTableMenuItem.setOnAction(t -> createTable());
         MenuItem addNewRowTableMenuItem = new MenuItem("Add New Row");
         addNewRowTableMenuItem.setOnAction(t -> addNewRowTable());
@@ -90,11 +91,7 @@ public class MainWindow extends Application {
                 addNewRowTableMenuItem
         );
 
-        MenuItem helpMenuItem = new MenuItem("About");
-        helpMenuItem.setOnAction(t -> showHelpWindow());
-        menuHelp.getItems().addAll(helpMenuItem);
-
-        menuBar.getMenus().addAll(menuFile, menuTable, menuHelp);
+        menuBar.getMenus().addAll(menuFile, menuTable);
         verticalLayout.getChildren().add(menuBar);
     }
 
@@ -163,7 +160,22 @@ public class MainWindow extends Application {
         comboBoxes.add(comboBox);
         columnCreationLayout.getChildren().addAll(new Label("Column"), comboBox);
         _verticalLayout.getChildren().add(columnCreationLayout);
+
         addNewColumnButton.setOnAction(e -> {
+            int curr = comboBoxes.size() - 1;
+            if (comboBoxes.get(curr).getValue() == null) {
+                showErrorMessage("Choose the type of the last column");
+                return;
+            }
+            if (comboBoxes.get(curr).getValue() == "Enum") {
+
+                VBox tmpLayout = new VBox();
+                tmpLayout.getChildren().addAll(new Label("Enter space-separated values"), new TextField(), new Button("Create Enum"));
+                Stage tmpWindow = new Stage();
+                tmpWindow.setTitle("Enum Values");
+                tmpWindow.setScene(new Scene(tmpLayout));
+                tmpWindow.show();
+            }
             HBox _columnCreationLayout = new HBox();
             ComboBox _comboBox = new ComboBox(availableOptions);
             comboBoxes.add(_comboBox);
@@ -172,23 +184,12 @@ public class MainWindow extends Application {
         });
 
         createNewTableButton.setOnAction(e -> {
-            boolean allTypesChosen = true;
             ArrayList<Column> columns = new ArrayList<>();
-            for (ComboBox _comboBox : comboBoxes) {
-                if (_comboBox.getValue() == null) {
-                    allTypesChosen = false;
-                    break;
-                } else {
-                    try {
-                        columns.add(new Column(_comboBox.getValue().toString(), "com.univ.it.dbtype.Attribute" + _comboBox.getValue().toString()));
-                    } catch (Exception e1) {
-                        e1.printStackTrace();
-                    }
-                }
+            for (ComboBox _comboBox : comboBoxes) { try {
+                columns.add(new Column(_comboBox.getValue().toString(), "com.univ.it.dbtype.Attribute" + _comboBox.getValue().toString()));
+            } catch (Exception e1) {
+                e1.printStackTrace();
             }
-            if (!allTypesChosen) {
-                showErrorMessage("Not all Types are chosen");
-                return;
             }
             if (!tableNameTextField.getText().equals("")) {
                 String tableName = tableNameTextField.getText();
@@ -377,22 +378,6 @@ public class MainWindow extends Application {
         alert.setContentText(message);
 
         alert.showAndWait();
-    }
-
-    private void showHelpWindow() {
-        Label secondLabel = new Label("Author: Student");
-
-        StackPane secondaryLayout = new StackPane();
-        secondaryLayout.getChildren().add(secondLabel);
-
-        Scene secondScene = new Scene(secondaryLayout, 230, 100);
-
-        // New window (Stage)
-        Stage newWindow = new Stage();
-        newWindow.setTitle("About");
-        newWindow.setScene(secondScene);
-
-        newWindow.show();
     }
 
     private void initializeTableTab() {
