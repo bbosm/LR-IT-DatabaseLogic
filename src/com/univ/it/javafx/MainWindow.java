@@ -158,7 +158,8 @@ public class MainWindow extends Application {
         ArrayList<ComboBox> comboBoxes = new ArrayList<>();
         ComboBox comboBox = new ComboBox(availableOptions);
         comboBoxes.add(comboBox);
-        columnCreationLayout.getChildren().addAll(new Label("Column"), comboBox);
+        TextField columnNameTextField = new TextField();
+        columnCreationLayout.getChildren().addAll(new Label("Column"), comboBox, columnNameTextField);
         _verticalLayout.getChildren().add(columnCreationLayout);
 
         addNewColumnButton.setOnAction(e -> {
@@ -179,7 +180,8 @@ public class MainWindow extends Application {
             HBox _columnCreationLayout = new HBox();
             ComboBox _comboBox = new ComboBox(availableOptions);
             comboBoxes.add(_comboBox);
-            _columnCreationLayout.getChildren().addAll(new Label("Column"), _comboBox);
+            TextField _columnNameTextField = new TextField();
+            _columnCreationLayout.getChildren().addAll(new Label("Column"), _comboBox, _columnNameTextField);
             _verticalLayout.getChildren().add(_columnCreationLayout);
         });
 
