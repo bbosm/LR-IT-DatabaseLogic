@@ -101,7 +101,7 @@ public class MainWindow extends Application {
 
     private void search()
     {
-        /*HBox columnLayout = new HBox();
+        HBox columnLayout = new HBox();
         ArrayList<TextField> textFields = new ArrayList<>();
 
         for (int i = 0; i < currTable.getColumns().size(); ++i)
@@ -109,7 +109,7 @@ public class MainWindow extends Application {
             VBox tmpLayout = new VBox();
             String name = currTable.getColumns().get(i).getClassName();
             textFields.add(new TextField());
-            tmpLayout.getChildren().addAll(new Label(name), new TextField());
+            tmpLayout.getChildren().addAll(new Label(name), textFields.get(i));
             columnLayout.getChildren().add(tmpLayout);
         }
 
@@ -124,16 +124,33 @@ public class MainWindow extends Application {
         tmpWindow.show();
 
         tmpButton.setOnAction(e -> {
+            Table searchTable = new Table(null, currTable.getName(), currTable.getColumns());
+
             for (int i = 0; i < currTable.getRows().size(); ++i)
             {
                 boolean add = true;
+                Row tmpRow = currTable.getRows().get(i);
                 for (int j = 0; j < currTable.getColumns().size(); ++j)
                 {
-                    if (!)
-
+                    String tmpString = textFields.get(j).getText();
+                    if (!tmpString.equals(""))
+                    {
+                        if (!tmpRow.get(j).toString().equals(tmpString))
+                        {
+                            add = false;
+                            break;
+                        }
+                    }
+                }
+                if (add)
+                {
+                    searchTable.addRow(tmpRow.getValues());
                 }
             }
-        });*/
+
+            tmpWindow.close();
+            showTable(searchTable);
+        });
     }
 
     private void createDb() {
