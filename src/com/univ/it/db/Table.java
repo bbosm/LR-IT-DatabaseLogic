@@ -85,6 +85,7 @@ public class Table {
     }
 
     public void saveToFile(String pathToFile) throws IOException {
+        // TODO: check for not null paths (pathToFile or this.pathToFile)
         this.pathToFile = pathToFile;
 
         FileWriter fw = new FileWriter(pathToFile);

@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
 
 public class AttributeTypesTest {
 
@@ -41,6 +44,28 @@ public class AttributeTypesTest {
     @Test(expected = ParseException.class)
     public void dateInvlEmptyString() throws ParseException {
         Attribute a = new AttributeDateInvl("");
+    }
+
+    @Test
+    public void dateInvlIsInside() throws ParseException {
+        AttributeDateInvl a = new AttributeDateInvl("2017.02.1 2017.10.10");
+        Date dateIn = AttributeDate.dateToStr.parse("2017.4.1");
+        Date dateLess = AttributeDate.dateToStr.parse("2017.1.01");
+        Date dateGreater = AttributeDate.dateToStr.parse("2018.1.01");
+
+        assertEquals(a.isInside(dateIn), true);
+        assertEquals(a.isInside(dateLess), false);
+        assertEquals(a.isInside(dateGreater), false);
+    }
+
+    @Test
+    public void dateInvlBorders() throws ParseException {
+        AttributeDateInvl a = new AttributeDateInvl("2017.2.1 2017.10.10");
+        Date dateLeft = AttributeDate.dateToStr.parse("2017.2.1");
+        Date dateRight = AttributeDate.dateToStr.parse("2017.10.10");
+
+        assertEquals(a.isInside(dateLeft), true);
+        assertEquals(a.isInside(dateRight), true);
     }
 
 
