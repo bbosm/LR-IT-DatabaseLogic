@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.text.ParseException;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertEquals;
 
 public class AttributeTypesTest {
 
@@ -47,9 +47,9 @@ public class AttributeTypesTest {
         Date dateLess = AttributeDate.dateToStr.parse("2017.1.01");
         Date dateGreater = AttributeDate.dateToStr.parse("2018.1.01");
 
-        assertEquals(a.isInside(dateIn), true);
-        assertEquals(a.isInside(dateLess), false);
-        assertEquals(a.isInside(dateGreater), false);
+        assertEquals(true, a.isInside(dateIn));
+        assertEquals(false, a.isInside(dateLess));
+        assertEquals(false, a.isInside(dateGreater));
     }
 
     @Test
@@ -58,7 +58,7 @@ public class AttributeTypesTest {
         Date dateLeft = AttributeDate.dateToStr.parse("2017.2.1");
         Date dateRight = AttributeDate.dateToStr.parse("2017.10.10");
 
-        assertEquals(a.isInside(dateLeft), true);
-        assertEquals(a.isInside(dateRight), true);
+        assertEquals(true, a.isInside(dateLeft));
+        assertEquals(true, a.isInside(dateRight));
     }
 }

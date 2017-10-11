@@ -102,6 +102,9 @@ public class MainWindow extends Application {
 
     private void search()
     {
+        String tableName = tabPane.getSelectionModel().getSelectedItem().getText();
+        currTable = currentDB.getTables().get(tableName);
+
         HBox columnLayout = new HBox();
         ArrayList<TextField> textFields = new ArrayList<>();
 
