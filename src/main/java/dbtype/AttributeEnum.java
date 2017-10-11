@@ -1,6 +1,6 @@
-package com.univ.it.dbtype;
+package dbtype;
 
-import com.univ.it.db.ColumnEnum;
+import db.ColumnEnum;
 
 public class AttributeEnum extends Attribute {
     private int index;

@@ -1,4 +1,4 @@
-package com.univ.it.db;
+package db;
 
 import java.util.ArrayList;
 

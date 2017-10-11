@@ -1,7 +1,7 @@
-package com.univ.it.javafx;
+package gui;
 
-import com.univ.it.db.*;
-import com.univ.it.dbtype.Attribute;
+import db.*;
+import dbtype.Attribute;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -202,7 +202,7 @@ public class MainWindow extends Application {
                         vals.add(enumVals[i]);
                     }
 
-                    currColumns.add(new ColumnEnum(columnName,"com.univ.it.dbtype.AttributeEnum", vals));
+                    currColumns.add(new ColumnEnum(columnName,"dbtype.AttributeEnum", vals));
                     tmpWindow.close();
                 }
                 catch (Exception e1) {
@@ -213,7 +213,7 @@ public class MainWindow extends Application {
         else
         {
             try {
-                currColumns.add(new Column(columnName, "com.univ.it.dbtype.Attribute" + className.toString()));
+                currColumns.add(new Column(columnName, "dbtype.Attribute" + className.toString()));
             }
             catch (Exception e1) {
                 e1.printStackTrace();

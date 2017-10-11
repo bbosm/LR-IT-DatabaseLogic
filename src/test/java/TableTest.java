@@ -1,13 +1,11 @@
-package com.univ.it.test;
-
-import com.univ.it.db.Column;
-import com.univ.it.db.ColumnEnum;
-import com.univ.it.db.Row;
-import com.univ.it.db.Table;
-import com.univ.it.dbtype.Attribute;
-import com.univ.it.dbtype.AttributeDate;
-import com.univ.it.dbtype.AttributeEnum;
-import com.univ.it.dbtype.AttributeInteger;
+import db.Column;
+import db.ColumnEnum;
+import db.Row;
+import db.Table;
+import dbtype.Attribute;
+import dbtype.AttributeDate;
+import dbtype.AttributeEnum;
+import dbtype.AttributeInteger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,9 +36,9 @@ public class TableTest {
         enumValues.add("Yellow");
 
         ArrayList<Column> columns = new ArrayList<>();
-        columns.add(new Column("Date", "com.univ.it.dbtype.AttributeDate"));
-        columns.add(new Column("Int", "com.univ.it.dbtype.AttributeInteger"));
-        ColumnEnum ce = new ColumnEnum("Enum","com.univ.it.dbtype.AttributeEnum", enumValues);
+        columns.add(new Column("Date", "dbtype.AttributeDate"));
+        columns.add(new Column("Int", "dbtype.AttributeInteger"));
+        ColumnEnum ce = new ColumnEnum("Enum","dbtype.AttributeEnum", enumValues);
         columns.add(ce);
 
         table = new Table(pathToTable, "testTable", columns);

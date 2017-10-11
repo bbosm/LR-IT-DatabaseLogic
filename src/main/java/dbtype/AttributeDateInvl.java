@@ -1,4 +1,4 @@
-package com.univ.it.dbtype;
+package dbtype;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

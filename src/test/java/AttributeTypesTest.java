@@ -1,6 +1,4 @@
-package com.univ.it.test;
-
-import com.univ.it.dbtype.*;
+import dbtype.*;
 import org.junit.Test;
 
 import java.text.ParseException;

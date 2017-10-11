@@ -1,7 +1,7 @@
-package com.univ.it.db;
+package db;
 
-import com.univ.it.dbtype.Attribute;
-import com.univ.it.dbtype.AttributeEnum;
+import dbtype.Attribute;
+import dbtype.AttributeEnum;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;

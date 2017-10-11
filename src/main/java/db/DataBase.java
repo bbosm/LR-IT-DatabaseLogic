@@ -1,4 +1,4 @@
-package com.univ.it.db;
+package db;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;

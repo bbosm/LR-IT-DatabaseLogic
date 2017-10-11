@@ -1,4 +1,4 @@
-package com.univ.it.dbtype;
+package dbtype;
 
 public class AttributeInteger extends Attribute {
     private int val;

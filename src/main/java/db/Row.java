@@ -1,6 +1,6 @@
-package com.univ.it.db;
+package db;
 
-import com.univ.it.dbtype.Attribute;
+import dbtype.Attribute;
 
 import java.util.ArrayList;
 
