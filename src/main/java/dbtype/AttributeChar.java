@@ -1,12 +1,8 @@
 package dbtype;
 
 public class AttributeChar extends Attribute {
-    private char val;
 
-    public AttributeChar(char val) {
-        super("");
-        this.val = val;
-    }
+    private char val;
 
     public AttributeChar(String s) {
         super(s);

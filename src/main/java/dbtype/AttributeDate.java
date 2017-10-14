@@ -5,7 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class AttributeDate extends Attribute {
+
     private Date val;
+
     static public final SimpleDateFormat dateToStr = new SimpleDateFormat("yyyy.MM.dd");
 
     public AttributeDate(String s) throws ParseException {

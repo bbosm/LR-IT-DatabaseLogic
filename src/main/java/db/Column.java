@@ -4,41 +4,33 @@ import java.lang.reflect.Constructor;
 
 public class Column {
     String name;
-    String className;
-    private Class attributeType;
-    private Constructor stringConstructor;
+    String attributeType;
 
-    public Column(String name, String className) throws ClassNotFoundException, NoSuchMethodException {
+    public Column(String name, String attributeType) throws ClassNotFoundException, NoSuchMethodException {
         this.name = name;
-        this.className = className;
-
-        this.attributeType = Class.forName(className);
-        this.stringConstructor = attributeType.getConstructor(String.class);
+        this.attributeType = attributeType;
     }
 
     public Column(String s) throws NoSuchMethodException, ClassNotFoundException {
         String[] columnsFields = s.split("\\t");
         this.name = columnsFields[1];
-        this.className = columnsFields[2];
-
-        this.attributeType = Class.forName(className);
-        this.stringConstructor = attributeType.getConstructor(String.class);
+        this.attributeType = columnsFields[2];
     }
 
     @Override
     public String toString() {
-        return "Column" + '\t' + name + '\t' + className;
+        return name + '\t' + attributeType;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getClassName() {
-        return className.substring(className.lastIndexOf(".Attribute") + 10);
+    public String getAttributeType() {
+        return attributeType.substring(attributeType.lastIndexOf(".Attribute") + 10);
     }
 
     public Constructor getStringConstructor() {
-        return stringConstructor;
+        return null;
     }
 }

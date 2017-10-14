@@ -1,25 +1,26 @@
 package dbtype;
 
-import db.ColumnEnum;
+import db.Column;
+import db.EnumColumn;
 
 public class AttributeEnum extends Attribute {
     private int index;
-    private ColumnEnum ce;
+    private EnumColumn enumColumn;
 
     public AttributeEnum(String s) {
         super(s);
         System.out.println("Wrong usage AttributeEnum, " + s);
     }
 
-    public AttributeEnum(String s, ColumnEnum ce) {
+    public AttributeEnum(String s, Column column) {
         super(s);
         this.index = Integer.parseInt(s);
-        this.ce = ce;
+        this.enumColumn = (EnumColumn)column;
     }
 
     @Override
     public String toString() {
-        return ce.getValues().get(index);
+        return enumColumn.getValues().get(index);
     }
 
     @Override

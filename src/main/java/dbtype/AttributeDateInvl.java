@@ -5,8 +5,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class AttributeDateInvl extends Attribute {
+
     private Date left;
     private Date right;
+
     static private final SimpleDateFormat dateToStr = AttributeDate.dateToStr;
 
     public AttributeDateInvl(String s) throws ParseException {

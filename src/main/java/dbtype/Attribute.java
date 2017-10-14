@@ -1,7 +1,8 @@
 package dbtype;
 
 public class Attribute {
-    public Attribute(String s) {}
+    public Attribute(@SuppressWarnings("unused") String s) {
+    }
 
     public String toFile() {
         return toString();

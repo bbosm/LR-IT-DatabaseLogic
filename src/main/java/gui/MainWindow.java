@@ -1,5 +1,7 @@
 package gui;
 
+import serverSide.Server;
+
 import db.*;
 import dbtype.Attribute;
 import javafx.application.Application;
@@ -30,17 +32,12 @@ public class MainWindow extends Application {
 
     @Override
     public void start(Stage stage) {
+
         initUI(stage);
     }
 
     private VBox verticalLayout;
-    private DataBase currentDB;
-    private Table currTable;
     private TabPane tabPane;
-
-    // TODO: remove this
-    private final String tempTable = "C:\\Temp\\tb.db";
-    private final String tempDB = "/home/romashka/mydb/1.db";
 
     private final ObservableList<String> availableOptions =
             FXCollections.observableArrayList(
@@ -54,7 +51,8 @@ public class MainWindow extends Application {
             );
 
     private void initUI(Stage stage) {
-        currentDB = new DataBase(tempDB, new HashMap<String, Table>());
+
+        Server.createDb(null);
 
         StackPane root = new StackPane();
         verticalLayout = new VBox();
@@ -103,7 +101,7 @@ public class MainWindow extends Application {
     private void search()
     {
         String tableName = tabPane.getSelectionModel().getSelectedItem().getText();
-        currTable = currentDB.getTables().get(tableName);
+        Table currTable = Server.getTable(tableName);
 
         HBox columnLayout = new HBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -111,7 +109,7 @@ public class MainWindow extends Application {
         for (int i = 0; i < currTable.getColumns().size(); ++i)
         {
             VBox tmpLayout = new VBox();
-            String name = currTable.getColumns().get(i).getClassName();
+            String name = currTable.getColumns().get(i).getAttributeType();
             textFields.add(new TextField());
             tmpLayout.getChildren().addAll(new Label(name), textFields.get(i));
             columnLayout.getChildren().add(tmpLayout);
@@ -132,7 +130,8 @@ public class MainWindow extends Application {
             for (int j = 0; j < currTable.getColumns().size(); j++) {
                 fieldsSearch.add(textFields.get(j).getText());
             }
-            Table searchTable = currTable.search(fieldsSearch);
+
+            Table searchTable = Server.search(tableName, fieldsSearch);
 
             tmpWindow.close();
             showTable(searchTable);
@@ -155,10 +154,10 @@ public class MainWindow extends Application {
 
         createButton.setOnAction(e -> {
             if (!dbNameTextField.getText().equals("")) {
-                System.out.println(dbNameTextField.getText());
                 try {
-                    currentDB = new DataBase(dbNameTextField.getText(), new HashMap<String, Table>());
-                } catch (Exception e1) {
+                    Server.createDb(dbNameTextField.getText());
+                }
+                catch (Exception e1) {
                     e1.printStackTrace();
                 }
                 newWindow.close();
@@ -195,14 +194,8 @@ public class MainWindow extends Application {
 
             createEnumButton.setOnAction(r -> {
                 try {
-                    String[] enumVals = enumValues.getText().split("\\s+");
-                    ArrayList<String> vals = new ArrayList<>();
-
-                    for (int i = 0; i < enumVals.length; ++i) {
-                        vals.add(enumVals[i]);
-                    }
-
-                    currColumns.add(new ColumnEnum(columnName,"dbtype.AttributeEnum", vals));
+                    String str = "dbtype.AttributeEnum" + "\t" + enumValues.getText();
+                    currColumns.add(ColumnFactory.createColumn(ColumnFactory.makeEnumColumnString(str)));
                     tmpWindow.close();
                 }
                 catch (Exception e1) {
@@ -213,7 +206,8 @@ public class MainWindow extends Application {
         else
         {
             try {
-                currColumns.add(new Column(columnName, "dbtype.Attribute" + className.toString()));
+                String str = "dbtype.Attribute" + className.toString();
+                currColumns.add(ColumnFactory.createColumn(ColumnFactory.makePlainColumnString(str)));
             }
             catch (Exception e1) {
                 e1.printStackTrace();
@@ -283,12 +277,9 @@ public class MainWindow extends Application {
             if (isAdded) {
                 if (!tableNameTextField.getText().equals("")) {
                     String tableName = tableNameTextField.getText();
-                    String tableFilePath = currentDB.getPathForTables() + File.separator + tableName + ".db";
-                    Table newTable = new Table(tableFilePath, tableName, currColumns);
-                    currentDB.getTables().put(tableName, newTable);
+                    Server.createTable(tableName, currColumns);
                     newWindow.close();
-                    currTable = newTable;
-                    showTable(newTable);
+                    addTableToInterface(tableName);
                 } else {
                     showErrorMessage("Empty table name");
                 }
@@ -305,7 +296,7 @@ public class MainWindow extends Application {
         File file = fileChooser.showOpenDialog(newWindow);
         if (file != null) {
             try {
-                currentDB = new DataBase(file.getAbsolutePath());
+                Server.openDb(file.getAbsolutePath());
                 closeAllTabs();
                 showDataBase();
             } catch (Exception e) {
@@ -316,35 +307,18 @@ public class MainWindow extends Application {
         }
     }
 
+    //TODO Remove Direct chooser
     private void saveDb() {
-        if (currentDB.getPathToFile().equals(tempDB)) {
-            Stage newWindow = new Stage();
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setTitle("Open Database File");
-            File selectedDirectory = directoryChooser.showDialog(newWindow);
-            if (selectedDirectory != null) {
-                try {
-                    currentDB.saveToFile(selectedDirectory.getAbsolutePath());
-                } catch (Exception e) {
-                    showErrorMessage(e.toString());
-                }
-            } else {
-                showErrorMessage("Choose file");
-            }
+        try {
+            Server.saveDb();
         }
-        else
-            try {
-                currentDB.saveToFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void showDataBase() {
-        HashMap<String, Table> tables = new HashMap<>();
-        for (Table table : currentDB.getTables().values()) {
-            tables.put(table.getName(), table);
-        }
+        HashMap<String, Table> tables = Server.getTables();
 
         for (HashMap.Entry<String, Table> entry : tables.entrySet()) {
             String tableName = entry.getKey();
@@ -396,11 +370,7 @@ public class MainWindow extends Application {
     private void addNewRowTable() {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
         String tableName = tab.getText();
-        HashMap<String, Table> tables = new HashMap<>();
-        for (Table table : currentDB.getTables().values()) {
-            tables.put(table.getName(), table);
-        }
-        Table table = tables.get(tableName);
+        Table table = Server.getTable(tableName);
 
         VBox mainLayout = new VBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -455,13 +425,13 @@ public class MainWindow extends Application {
         newWindow.show();
     }
 
-    private void showTable(Table table) {
+    private void addTableToInterface(String tableName) {
         Tab tab = new Tab();
-        tab.setText(table.getName());
+        tab.setText(tableName);
         TableView tableView = new TableView();
         tab.setContent(tableView);
         tabPane.getTabs().add(tab);
-        showTable(table, tableView);
+        showTable(Server.getTable(tableName), tableView);
     }
 
     private static void showErrorMessage(String message) {

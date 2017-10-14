@@ -43,10 +43,7 @@ public class Table {
             columns = new ArrayList<>(columnsSize);
             for (int columnId = 0; columnId < columnsSize; columnId++) {
                 sCurrentLine = br.readLine();
-                if (sCurrentLine.split("\\t")[0].equals("ColumnEnum"))
-                    columns.add(new ColumnEnum(sCurrentLine));
-                else
-                    columns.add(new Column(sCurrentLine));
+                columns.add(ColumnFactory.createColumn(sCurrentLine));
             }
 
             // row lines
@@ -55,16 +52,15 @@ public class Table {
                 sCurrentLine = br.readLine();
                 String[] rowFields = sCurrentLine.split("\\t");
                 ArrayList<Attribute> rowValues = new ArrayList<>(columnsSize);
+
                 for (int columnId = 0; columnId < columnsSize; columnId++) {
-                    Column column = columns.get(columnId);
-                    if (column.getClassName().equals("Enum")) {
-                        rowValues.add(new AttributeEnum(rowFields[columnId], (ColumnEnum) column));
-                    } else {
-                        rowValues.add(constructField(columnId, rowFields[columnId]));                    }
+                    rowValues.add(constructField(columnId, rowFields[columnId]));
                 }
+
                 rows.add(new Row(rowValues));
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -128,7 +124,13 @@ public class Table {
             IllegalAccessException,
             InvocationTargetException,
             InstantiationException {
-        return (Attribute) columns.get(columnNumber).getStringConstructor().newInstance(s);
+        Column currColumn = columns.get(columnNumber);
+
+        if (currColumn.getAttributeType().equals("Enum")) {
+            return new AttributeEnum(s, currColumn);
+        }
+
+        return (Attribute)currColumn.getStringConstructor().newInstance(s);
     }
 
     public void setField(int rowNumber, int columnNumber, String s) throws
