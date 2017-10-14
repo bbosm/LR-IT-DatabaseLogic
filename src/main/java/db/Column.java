@@ -3,31 +3,31 @@ package db;
 import java.lang.reflect.Constructor;
 
 public class Column {
-    String name;
-    String attributeTypeName;
+    private String attributeShortTypeName;
+    private String name;
 
-    public Column(String name, String attributeTypeName) throws ClassNotFoundException, NoSuchMethodException {
+    public Column(String attributeShortTypeName, String name) throws ClassNotFoundException, NoSuchMethodException {
+        this.attributeShortTypeName = attributeShortTypeName;
         this.name = name;
-        this.attributeTypeName = attributeTypeName;
     }
 
     public Column(String s) throws NoSuchMethodException, ClassNotFoundException {
         String[] columnsFields = s.split("\\t");
+        this.attributeShortTypeName = columnsFields[0];
         this.name = columnsFields[1];
-        this.attributeTypeName = columnsFields[2];
     }
 
     @Override
     public String toString() {
-        return name + '\t' + attributeTypeName;
+        return attributeShortTypeName + "\t" + name;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getAttributeTypeName() {
-        return attributeTypeName.substring(attributeTypeName.lastIndexOf(".Attribute") + 10);
+    public String getAttributeShortTypeName() {
+        return attributeShortTypeName;
     }
 
     public Constructor getStringConstructor() {

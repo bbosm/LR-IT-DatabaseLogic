@@ -52,7 +52,7 @@ public class Server {
     }
 
     static public void createTable(String tableName, ArrayList<Column> currColumns) {
-        String tableFilePath = currentDB.getPathForTables() + File.separator + tableName + ".db";
+        String tableFilePath = currentDB.getPathForTables() + File.separator + tableName + ".tb";
         Table newTable = new Table(tableFilePath, tableName, currColumns);
         currentDB.getTables().put(tableName, newTable);
     }

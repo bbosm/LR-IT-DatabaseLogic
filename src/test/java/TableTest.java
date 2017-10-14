@@ -1,7 +1,4 @@
-import db.Column;
-import db.EnumColumn;
-import db.Row;
-import db.Table;
+import db.*;
 import dbtype.Attribute;
 import dbtype.AttributeDate;
 import dbtype.AttributeEnum;
@@ -18,7 +15,7 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 
 public class TableTest {
-    String pathToTable = "D:\\Temp\\bd.db";
+    String pathToTable = "D:\\Temp\\bd.tb";
     private Table table;
     private final int columnsSize = 3;
 
@@ -31,40 +28,42 @@ public class TableTest {
             InvocationTargetException,
             IOException,
             ParseException {
-        ArrayList<String> enumValues = new ArrayList<>();
-        enumValues.add("Red");
-        enumValues.add("Yellow");
 
         ArrayList<Column> columns = new ArrayList<>();
-        columns.add(new Column("DateColumnName", "dbtype.AttributeDate"));
-        columns.add(new Column("IntColumnName", "dbtype.AttributeInteger"));
-        EnumColumn ce = new EnumColumn("EnumColumnName","dbtype.AttributeEnum", enumValues);
-        columns.add(ce);
+        columns.add(
+                ColumnFactory.createColumn(
+                        ColumnFactory.makePlainColumnString("Date", "DateColumnName")));
+        columns.add(
+                ColumnFactory.createColumn(
+                        ColumnFactory.makePlainColumnString("Integer", "IntColumnName")));
+        columns.add(
+                ColumnFactory.createColumn(
+                        ColumnFactory.makeEnumColumnString("EnumColumnName", "Red Yellow")));
 
         table = new Table(pathToTable, "testTable", columns);
 
         ArrayList<Attribute> row = new ArrayList<>(columnsSize);
         row.add(new AttributeDate("2017.10.9"));
         row.add(new AttributeInteger(4));
-        row.add(new AttributeEnum("0", ce));
+        row.add(new AttributeEnum("0", columns.get(2)));
         table.addRow(row);
 
         row = new ArrayList<>();
         row.add(new AttributeDate("2017.10.13"));
         row.add(new AttributeInteger(2));
-        row.add(new AttributeEnum("1", ce));
+        row.add(new AttributeEnum("1", columns.get(2)));
         table.addRow(row);
 
         row = new ArrayList<>();
         row.add(new AttributeDate("2017.10.16"));
         row.add(new AttributeInteger("4"));
-        row.add(new AttributeEnum("0", ce));
+        row.add(new AttributeEnum("0", columns.get(2)));
         table.addRow(row);
 
         row = new ArrayList<>();
         row.add(new AttributeDate("2017.10.13"));
         row.add(new AttributeInteger(6));
-        row.add(new AttributeEnum("0", ce));
+        row.add(new AttributeEnum("0", columns.get(2)));
         table.addRow(row);
     }
 
@@ -177,6 +176,41 @@ public class TableTest {
         table.saveToFile();
 
         Table table2 = new Table(pathToTable);
+
+        assertEquals("testTable", table2.getName());
+
+        assertEquals("Date", table2.getColumns().get(0).getAttributeShortTypeName());
+        assertEquals("DateColumnName", table2.getColumns().get(0).getName());
+
+        assertEquals("Integer", table2.getColumns().get(1).getAttributeShortTypeName());
+        assertEquals("IntColumnName", table2.getColumns().get(1).getName());
+
+        EnumColumn enumColumn = (EnumColumn) table2.getColumns().get(2);
+        assertEquals("Enum", enumColumn.getAttributeShortTypeName());
+        assertEquals("EnumColumnName", enumColumn.getName());
+        assertEquals("Red", enumColumn.getValues().get(0));
+        assertEquals("Yellow", enumColumn.getValues().get(1));
+
+        assertEquals("2017.10.09", table2.getRows().get(0).getValues().get(0).toString());
+        assertEquals("4",          table2.getRows().get(0).getValues().get(1).toString());
+        assertEquals("Red",          table2.getRows().get(0).getValues().get(2).toString());
+        assertEquals("0",          table2.getRows().get(0).getValues().get(2).toFile());
+
+        assertEquals("2017.10.13", table2.getRows().get(1).getValues().get(0).toString());
+        assertEquals("2",          table2.getRows().get(1).getValues().get(1).toString());
+        assertEquals("Yellow",     table2.getRows().get(1).getValues().get(2).toString());
+        assertEquals("1",          table2.getRows().get(1).getValues().get(2).toFile());
+
+        assertEquals("2017.10.16", table2.getRows().get(2).getValues().get(0).toString());
+        assertEquals("4",          table2.getRows().get(2).getValues().get(1).toString());
+        assertEquals("Red",        table2.getRows().get(2).getValues().get(2).toString());
+        assertEquals("0",          table2.getRows().get(2).getValues().get(2).toFile());
+
+        assertEquals("2017.10.13", table2.getRows().get(3).getValues().get(0).toString());
+        assertEquals("6",          table2.getRows().get(3).getValues().get(1).toString());
+        assertEquals("Red",        table2.getRows().get(3).getValues().get(2).toString());
+        assertEquals("0",          table2.getRows().get(3).getValues().get(2).toFile());
+
         table2.saveToFile();
     }
 }

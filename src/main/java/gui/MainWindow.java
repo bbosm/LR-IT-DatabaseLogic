@@ -40,13 +40,12 @@ public class MainWindow extends Application {
 
     private final ObservableList<String> availableOptions =
             FXCollections.observableArrayList(
-
                     "Integer",
                     "Real",
                     "Char",
                     "Enum",
-                            "Date",
-                            "DateInvl"
+                    "Date",
+                    "DateInvl"
             );
 
     private void initUI(Stage stage) {
@@ -108,7 +107,7 @@ public class MainWindow extends Application {
         for (int i = 0; i < currTable.getColumns().size(); ++i)
         {
             VBox tmpLayout = new VBox();
-            String name = currTable.getColumns().get(i).getAttributeTypeName();
+            String name = currTable.getColumns().get(i).getAttributeShortTypeName();
             textFields.add(new TextField());
             tmpLayout.getChildren().addAll(new Label(name), textFields.get(i));
             columnLayout.getChildren().add(tmpLayout);
@@ -198,8 +197,7 @@ public class MainWindow extends Application {
 
             createEnumButton.setOnAction(r -> {
                 try {
-                    String str = "dbtype.AttributeEnum" + "\t" + enumValues.getText();
-                    currColumns.add(ColumnFactory.createColumn(ColumnFactory.makeEnumColumnString(str)));
+                    currColumns.add(ColumnFactory.createColumn(ColumnFactory.makeEnumColumnString(columnName, enumValues.getText())));
                     tmpWindow.close();
                 }
                 catch (Exception e1) {
@@ -210,8 +208,10 @@ public class MainWindow extends Application {
         else
         {
             try {
-                String str = "dbtype.Attribute" + className.toString();
-                currColumns.add(ColumnFactory.createColumn(ColumnFactory.makePlainColumnString(str)));
+                currColumns.add(
+                        ColumnFactory.createColumn(
+                                ColumnFactory.makePlainColumnString(
+                                        Attribute.getFullTypeName(className.toString()), columnName)));
             }
             catch (Exception e1) {
                 e1.printStackTrace();
