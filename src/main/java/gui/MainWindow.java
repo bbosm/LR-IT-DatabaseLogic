@@ -16,7 +16,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -109,7 +108,7 @@ public class MainWindow extends Application {
         for (int i = 0; i < currTable.getColumns().size(); ++i)
         {
             VBox tmpLayout = new VBox();
-            String name = currTable.getColumns().get(i).getAttributeType();
+            String name = currTable.getColumns().get(i).getAttributeTypeName();
             textFields.add(new TextField());
             tmpLayout.getChildren().addAll(new Label(name), textFields.get(i));
             columnLayout.getChildren().add(tmpLayout);
@@ -132,9 +131,14 @@ public class MainWindow extends Application {
             }
 
             Table searchTable = Server.search(tableName, fieldsSearch);
-
             tmpWindow.close();
-            showTable(searchTable);
+
+            Tab tab = new Tab();
+            tab.setText(searchTable.getName());
+            TableView tableView = new TableView();
+            tab.setContent(tableView);
+            tabPane.getTabs().add(tab);
+            showTable(searchTable, tableView);
         });
     }
 

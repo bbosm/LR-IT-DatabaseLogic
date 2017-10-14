@@ -1,5 +1,5 @@
 import db.Column;
-import db.ColumnEnum;
+import db.EnumColumn;
 import db.Row;
 import db.Table;
 import dbtype.Attribute;
@@ -36,9 +36,9 @@ public class TableTest {
         enumValues.add("Yellow");
 
         ArrayList<Column> columns = new ArrayList<>();
-        columns.add(new Column("Date", "dbtype.AttributeDate"));
-        columns.add(new Column("Int", "dbtype.AttributeInteger"));
-        ColumnEnum ce = new ColumnEnum("Enum","dbtype.AttributeEnum", enumValues);
+        columns.add(new Column("DateColumnName", "dbtype.AttributeDate"));
+        columns.add(new Column("IntColumnName", "dbtype.AttributeInteger"));
+        EnumColumn ce = new EnumColumn("EnumColumnName","dbtype.AttributeEnum", enumValues);
         columns.add(ce);
 
         table = new Table(pathToTable, "testTable", columns);

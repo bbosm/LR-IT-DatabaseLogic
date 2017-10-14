@@ -33,7 +33,12 @@ public class Server {
 
     // TODO : public static ArrayList<String> getListOfDatabases();
 
-    static public void openDb(String fileName) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    static public void openDb(String fileName) throws
+            ClassNotFoundException,
+            NoSuchMethodException,
+            InstantiationException,
+            IllegalAccessException,
+            InvocationTargetException {
         currentDB = new DataBase(fileName);
     }
 

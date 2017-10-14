@@ -126,7 +126,7 @@ public class Table {
             InstantiationException {
         Column currColumn = columns.get(columnNumber);
 
-        if (currColumn.getAttributeType().equals("Enum")) {
+        if (currColumn.getAttributeTypeName().equals("Enum")) {
             return new AttributeEnum(s, currColumn);
         }
 
