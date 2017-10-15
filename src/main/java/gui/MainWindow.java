@@ -16,12 +16,10 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,8 +27,10 @@ public class MainWindow extends Application {
 
     private ArrayList<Column> currColumns = new ArrayList<>();
 
+    private DataBase currentDB = null;
+
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         initUI(stage);
     }
@@ -48,9 +48,7 @@ public class MainWindow extends Application {
                     "DateInvl"
             );
 
-    private void initUI(Stage stage) {
-
-        Server.createDb(null);
+    private void initUI(Stage stage) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 
         StackPane root = new StackPane();
         verticalLayout = new VBox();
@@ -62,28 +60,21 @@ public class MainWindow extends Application {
 
         root.getChildren().add(verticalLayout);
 
-        stage.setTitle("Database Logic");
+        stage.setTitle("Database Application");
         stage.setScene(scene);
         stage.show();
+
+        showDataBase(null);
     }
 
     private void initializeMenuBar() {
         MenuBar menuBar = new MenuBar();
-        Menu menuFile = new Menu("File");
         Menu menuTable = new Menu("Table");
-
-        MenuItem newDbMenuItem = new MenuItem("New DB");
-        newDbMenuItem.setOnAction(t -> createDb());
-        MenuItem openDbMenuItem = new MenuItem("Open DB");
-        openDbMenuItem.setOnAction(t -> openDb());
-        MenuItem saveDbMenuItem = new MenuItem("Save DB");
-        saveDbMenuItem.setOnAction(t -> saveDb());
-        menuFile.getItems().addAll(newDbMenuItem, openDbMenuItem, saveDbMenuItem);
 
         MenuItem newTableMenuItem = new MenuItem("Create Table");
         newTableMenuItem.setOnAction(t -> createTable());
         MenuItem addNewRowTableMenuItem = new MenuItem("Add New Row");
-        addNewRowTableMenuItem.setOnAction(t -> addNewRowTable());
+        addNewRowTableMenuItem.setOnAction(t -> addNewRow());
         MenuItem searchMenuItem = new MenuItem("Search");
         searchMenuItem.setOnAction(t -> search());
         menuTable.getItems().addAll(
@@ -92,14 +83,25 @@ public class MainWindow extends Application {
                 searchMenuItem
         );
 
-        menuBar.getMenus().addAll(menuFile, menuTable);
+        menuBar.getMenus().addAll(menuTable);
         verticalLayout.getChildren().add(menuBar);
     }
 
-    private void search()
-    {
+    private void updateDB() {
+        try {
+            currentDB = Server.getDB();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void search() {
         String tableName = tabPane.getSelectionModel().getSelectedItem().getText();
-        Table currTable = Server.getTable(tableName);
+
+        updateDB();
+
+        Table currTable = currentDB.getTable(tableName);
 
         HBox columnLayout = new HBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -139,39 +141,6 @@ public class MainWindow extends Application {
             tabPane.getTabs().add(tab);
             showTable(searchTable, tableView);
         });
-    }
-
-    private void createDb() {
-        Label secondLabel = new Label("filePath to data base");
-        TextField dbNameTextField = new TextField();
-        Button createButton = new Button("Create");
-
-        HBox secondaryLayout = new HBox();
-        secondaryLayout.getChildren().addAll(secondLabel, dbNameTextField, createButton);
-        Scene secondScene = new Scene(secondaryLayout);
-
-        // New window (Stage)
-        Stage newWindow = new Stage();
-        newWindow.setTitle("New Database");
-        newWindow.setScene(secondScene);
-
-        createButton.setOnAction(e -> {
-            if (!dbNameTextField.getText().equals("")) {
-                try {
-                    Server.createDb(dbNameTextField.getText());
-                }
-                catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-                newWindow.close();
-                closeAllTabs();
-                showDataBase();
-            } else {
-                showErrorMessage("Empty database name");
-            }
-        });
-
-        newWindow.show();
     }
 
     private boolean addColumnToTable(Object className, String columnName)
@@ -283,7 +252,12 @@ public class MainWindow extends Application {
                     String tableName = tableNameTextField.getText();
                     Server.createTable(tableName, currColumns);
                     newWindow.close();
-                    addTableToInterface(tableName);
+                    try {
+                        showDataBase(tableName);
+                    }
+                    catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
                 } else {
                     showErrorMessage("Empty table name");
                 }
@@ -293,47 +267,23 @@ public class MainWindow extends Application {
         newWindow.show();
     }
 
-    private void openDb() {
-        Stage newWindow = new Stage();
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Database File");
-        File file = fileChooser.showOpenDialog(newWindow);
-        if (file != null) {
-            try {
-                Server.openDb(file.getAbsolutePath());
-                closeAllTabs();
-                showDataBase();
-            } catch (Exception e) {
-                showErrorMessage(e.toString());
-            }
-        } else {
-            showErrorMessage("Choose file");
-        }
-    }
+    private void showDataBase(String currentTableName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        updateDB();
 
-    //TODO Remove Direct chooser
-    private void saveDb() {
-        try {
-            Server.saveDb();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        HashMap<String, Table> tables = currentDB.getTables();
 
-    private void showDataBase() {
-        HashMap<String, Table> tables = Server.getTables();
+        String currName = currentTableName;
 
         for (HashMap.Entry<String, Table> entry : tables.entrySet()) {
+            addTableToInterface(entry.getValue());
             String tableName = entry.getKey();
-            Table table = entry.getValue();
-            Tab tab = new Tab();
-            tab.setText(tableName);
-            TableView tableView = new TableView();
-            tab.setContent(tableView);
-            tabPane.getTabs().add(tab);
-            showTable(table, tableView);
+
+            if (null == currName) {
+                currName = tableName;
+            }
         }
+
+        // TODO: use currentTableName
     }
 
     @SuppressWarnings("unchecked")
@@ -371,10 +321,10 @@ public class MainWindow extends Application {
         tableView.setItems(data);
     }
 
-    private void addNewRowTable() {
+    private void addNewRow() {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
         String tableName = tab.getText();
-        Table table = Server.getTable(tableName);
+        Table table = currentDB.getTable(tableName);
 
         VBox mainLayout = new VBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -417,25 +367,32 @@ public class MainWindow extends Application {
                 showErrorMessage("Not all values filled");
             }
             try {
-                table.getRows().add(new Row(attributes));
+                Server.addNewRow(tableName, attributes);
+                updateDB();
             } catch (Exception ex) {
                 showErrorMessage(ex.toString());
             }
             newWindow.close();
-        closeAllTabs();
-        showDataBase();
+            closeAllTabs();
+            try {
+                showDataBase(null);
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }
         });
 
         newWindow.show();
     }
 
-    private void addTableToInterface(String tableName) {
+    private void addTableToInterface(Table table) {
         Tab tab = new Tab();
-        tab.setText(tableName);
+        tab.setText(table.getName());
         TableView tableView = new TableView();
         tab.setContent(tableView);
         tabPane.getTabs().add(tab);
-        showTable(Server.getTable(tableName), tableView);
+
+        showTable(table, tableView);
     }
 
     private static void showErrorMessage(String message) {

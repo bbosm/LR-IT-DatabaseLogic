@@ -33,7 +33,12 @@ public class DataBase {
                 tables.put(table.getName(), table);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            tables = new HashMap<>(0);
+            try {
+                this.saveToFile();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
@@ -58,6 +63,10 @@ public class DataBase {
 
     public void saveToFile() throws IOException {
         saveToFile(this.pathToFile);
+    }
+
+    public Table getTable(String name) {
+       return tables.get(name);
     }
 
     public String getPathForTables() {
