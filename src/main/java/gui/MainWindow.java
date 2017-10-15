@@ -321,8 +321,6 @@ public class MainWindow extends Application {
             int curr = comboBoxes.size() - 1;
             boolean isAdded = addColumnToTable(comboBoxes.get(curr).getValue(), textFields.get(curr).getText());
 
-            System.out.println(isAdded);
-
             if (isAdded) {
                 if (!tableNameTextField.getText().equals("")) {
                     String tableName = tableNameTextField.getText();

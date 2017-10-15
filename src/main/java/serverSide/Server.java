@@ -49,6 +49,7 @@ public class Server {
 
     public static void addNewRow(String tableName, ArrayList<Attribute> attributes) {
         dataBase.getTable(tableName).getRows().add(new Row(attributes));
+        saveDb();
     }
 
 }
