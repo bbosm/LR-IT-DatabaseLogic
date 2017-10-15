@@ -1,5 +1,6 @@
 ﻿# mydb
-Кузенко https://magistrs2016.github.io/
+Кузенко 
+https://magistrs2016.github.io/
 
 
 
@@ -9,6 +10,9 @@ Download & Install Intelij IDEA Community
 
   
 Intelij IDEA start window: Configure > Project Defaults > Project Structure - point SDK to JRE  
-Import project from sources  
-Create configuration Application and choose com.univ.it.javafx.Main as Main class  
-Create configuration Test with JUnit4 and choose com.univ.it.test.AttributeTypesTest as Main class  
+Open - folder with project marked with gradle icon
+Select 1, 2 and 4 checkboxes (don't touch anothers), press OK
+If gradle sync failed - close project, delete .idea/modules, .idea/modules.xml, mydb.iml
+View - Tool Windows - Gradle - Tasks:
+  Save application - run as "App" configuration
+  Save verification - test as "Test" configuration

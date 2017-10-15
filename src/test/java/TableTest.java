@@ -178,6 +178,8 @@ public class TableTest {
         Table table2 = new Table(pathToTable);
 
         assertEquals("testTable", table2.getName());
+        assertEquals(3, table2.getColumns().size());
+        assertEquals(4, table2.getRows().size());
 
         assertEquals("Date", table2.getColumns().get(0).getAttributeShortTypeName());
         assertEquals("DateColumnName", table2.getColumns().get(0).getName());
@@ -193,7 +195,7 @@ public class TableTest {
 
         assertEquals("2017.10.09", table2.getRows().get(0).getValues().get(0).toString());
         assertEquals("4",          table2.getRows().get(0).getValues().get(1).toString());
-        assertEquals("Red",          table2.getRows().get(0).getValues().get(2).toString());
+        assertEquals("Red",        table2.getRows().get(0).getValues().get(2).toString());
         assertEquals("0",          table2.getRows().get(0).getValues().get(2).toFile());
 
         assertEquals("2017.10.13", table2.getRows().get(1).getValues().get(0).toString());
