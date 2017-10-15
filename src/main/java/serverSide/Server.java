@@ -10,21 +10,18 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Server {
-
-    // TODO: remove this
-    private static final String tempDB = "D:\\Temp\\bd.db";
-    //"/home/romashka/mydb/1.db";
-    //"D:\\Temp\\bd.db"
+    // ends with File.separator or empty ("") String
+    private static final String dbFolderPath = "";
+    private static final String dbFileName = "bd.db";
 
     private static DataBase dataBase = null;
 
     public static DataBase getDB() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         if (null == dataBase)
         {
-            dataBase = new DataBase(tempDB);
+            dataBase = new DataBase(dbFolderPath + dbFileName);
         }
         return dataBase;
     }
@@ -39,7 +36,7 @@ public class Server {
     }
 
     static public void createTable(String tableName, ArrayList<Column> currColumns) {
-        String tableFilePath = dataBase.getPathForTables() + File.separator + tableName + ".tb";
+        String tableFilePath = dbFolderPath + tableName + ".tb";
         Table newTable = new Table(tableFilePath, tableName, currColumns);
         dataBase.getTables().put(tableName, newTable);
         saveDb();

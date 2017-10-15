@@ -69,10 +69,6 @@ public class DataBase {
        return tables.get(name);
     }
 
-    public String getPathForTables() {
-        return pathToFile.substring(0, pathToFile.lastIndexOf(File.separatorChar));
-    }
-
     public String getPathToFile() {
         return pathToFile;
     }

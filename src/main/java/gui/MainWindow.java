@@ -400,6 +400,7 @@ public class MainWindow extends Application {
             try {
                 Server.addNewRow(tableName, attributes);
                 updateDB();
+                switchInterfaceToTable(tableName);
             } catch (Exception ex) {
                 showErrorMessage(ex.toString());
             }
