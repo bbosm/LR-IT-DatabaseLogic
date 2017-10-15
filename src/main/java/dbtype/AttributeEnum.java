@@ -14,13 +14,17 @@ public class AttributeEnum extends Attribute {
 
     public AttributeEnum(String s, Column column) {
         super(s);
-        this.index = Integer.parseInt(s);
+        try {
+            this.index = Integer.parseInt(s);
+        } catch (NumberFormatException ex) {
+            this.index = ((EnumColumn)column).getIndex(s);
+        }
         this.enumColumn = (EnumColumn)column;
     }
 
     @Override
     public String toString() {
-        return enumColumn.getValues().get(index);
+        return enumColumn.getValue(index);
     }
 
     @Override

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 
 public class TableTest {
-    String pathToTable = "D:\\Temp\\bd.tb";
+    String pathToTable = "D:\\Temp\\bd.db";
     private Table table;
     private final int columnsSize = 3;
 
@@ -190,8 +190,8 @@ public class TableTest {
         EnumColumn enumColumn = (EnumColumn) table2.getColumns().get(2);
         assertEquals("Enum", enumColumn.getAttributeShortTypeName());
         assertEquals("EnumColumnName", enumColumn.getName());
-        assertEquals("Red", enumColumn.getValues().get(0));
-        assertEquals("Yellow", enumColumn.getValues().get(1));
+        assertEquals("Red", enumColumn.getValue(0));
+        assertEquals("Yellow", enumColumn.getValue(1));
 
         assertEquals("2017.10.09", table2.getRows().get(0).getValues().get(0).toString());
         assertEquals("4",          table2.getRows().get(0).getValues().get(1).toString());

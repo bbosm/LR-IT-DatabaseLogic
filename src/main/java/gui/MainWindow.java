@@ -1,5 +1,6 @@
 package gui;
 
+import dbtype.AttributeEnum;
 import serverSide.Server;
 
 import db.*;
@@ -380,9 +381,16 @@ public class MainWindow extends Application {
                 } else {
                     Column col = table.getColumns().get(i);
                     try {
-                        attributes.add((Attribute) col.getStringConstructor().newInstance(textField.getText()));
+                        if (col.getAttributeShortTypeName().equals("Enum")) {
+                            attributes.add(new AttributeEnum(textField.getText(), col));
+                        } else {
+                            attributes.add((Attribute) col.getStringConstructor().newInstance(textField.getText()));
+                        }
                     } catch (Exception ex) {
-                        showErrorMessage(ex.toString());
+                        ex.printStackTrace();
+                        System.out.println(attributes.size());
+                        System.out.println(col.getAttributeShortTypeName());
+//                        showErrorMessage(ex.toString());
                     }
                 }
             }

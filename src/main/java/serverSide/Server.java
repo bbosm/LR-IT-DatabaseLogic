@@ -15,7 +15,9 @@ import java.util.HashMap;
 public class Server {
 
     // TODO: remove this
-    private static final String tempDB = "/home/romashka/mydb/1.db";
+    private static final String tempDB = "D:\\Temp\\bd.db";
+    //"/home/romashka/mydb/1.db";
+    //"D:\\Temp\\bd.db"
 
     private static DataBase dataBase = null;
 

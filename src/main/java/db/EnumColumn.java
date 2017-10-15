@@ -21,7 +21,15 @@ public class EnumColumn extends Column {
         return super.toString() + "\t" + String.join(" ", values);
     }
 
-    public ArrayList<String> getValues() {
-        return values;
+    public String getValue(int index) {
+        return values.get(index);
+    }
+
+    public int getIndex(String value) {
+        for (int i = 0; i < values.size(); i++) {
+            if (value.equals(values.get(i)))
+                return i;
+        }
+        return -1;
     }
 }

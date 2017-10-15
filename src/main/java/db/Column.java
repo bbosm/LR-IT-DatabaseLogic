@@ -31,6 +31,7 @@ public class Column {
     }
 
     public Constructor getStringConstructor() {
+        System.out.println("ERROR wrong column type, string constructor null");
         return null;
     }
 }
