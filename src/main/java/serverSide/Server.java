@@ -36,11 +36,6 @@ public class Server {
         }
     }
 
-    //TODO: return table with name -> database class
-    static public Table getTable(String name) {
-        return dataBase.getTables().get(name);
-    }
-
     static public void createTable(String tableName, ArrayList<Column> currColumns) {
         String tableFilePath = dataBase.getPathForTables() + File.separator + tableName + ".tb";
         Table newTable = new Table(tableFilePath, tableName, currColumns);
@@ -49,11 +44,11 @@ public class Server {
     }
 
     public static Table search(String tableName, ArrayList<String> fieldsSearch) {
-        return getTable(tableName).search(fieldsSearch);
+        return dataBase.getTable(tableName).search(fieldsSearch);
     }
 
     public static void addNewRow(String tableName, ArrayList<Attribute> attributes) {
-        getTable(tableName).getRows().add(new Row(attributes));
+        dataBase.getTable(tableName).getRows().add(new Row(attributes));
     }
 
 }

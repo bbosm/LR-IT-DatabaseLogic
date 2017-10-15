@@ -25,18 +25,10 @@ import java.util.HashMap;
 
 public class MainWindow extends Application {
 
-    private ArrayList<Column> currColumns = new ArrayList<>();
-
-    private DataBase currentDB = null;
-
-    @Override
-    public void start(Stage stage) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-
-        initUI(stage);
-    }
-
-    private VBox verticalLayout;
     private TabPane tabPane;
+    private DataBase currentDB;
+    private ArrayList<Column> currColumns = null;
+
 
     private final ObservableList<String> availableOptions =
             FXCollections.observableArrayList(
@@ -48,15 +40,14 @@ public class MainWindow extends Application {
                     "DateInvl"
             );
 
-    private void initUI(Stage stage) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-
+    @Override
+    public void start(Stage stage) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         StackPane root = new StackPane();
-        verticalLayout = new VBox();
+        VBox verticalLayout = new VBox();
 
         Scene scene = new Scene(root, 600, 480);
 
-        initializeMenuBar();
-        initializeTableTab();
+        initUI(verticalLayout);
 
         root.getChildren().add(verticalLayout);
 
@@ -67,7 +58,7 @@ public class MainWindow extends Application {
         showDataBase(null);
     }
 
-    private void initializeMenuBar() {
+    private void initUI(VBox verticalLayout) {
         MenuBar menuBar = new MenuBar();
         Menu menuTable = new Menu("Table");
 
@@ -77,6 +68,7 @@ public class MainWindow extends Application {
         addNewRowTableMenuItem.setOnAction(t -> addNewRow());
         MenuItem searchMenuItem = new MenuItem("Search");
         searchMenuItem.setOnAction(t -> search());
+
         menuTable.getItems().addAll(
                 newTableMenuItem,
                 addNewRowTableMenuItem,
@@ -85,6 +77,9 @@ public class MainWindow extends Application {
 
         menuBar.getMenus().addAll(menuTable);
         verticalLayout.getChildren().add(menuBar);
+
+        tabPane = new TabPane();
+        verticalLayout.getChildren().add(tabPane);
     }
 
     private void updateDB() {
@@ -94,6 +89,87 @@ public class MainWindow extends Application {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    private void removeTabsFromInterface() {
+        tabPane.getTabs().clear();
+    }
+
+    private void addTableToInterface(Table table) {
+        Tab tab = new Tab();
+        tab.setText(table.getName());
+        TableView tableView = new TableView();
+        tab.setContent(tableView);
+        tabPane.getTabs().add(tab);
+
+        ObservableList<ObservableList> data = FXCollections.observableArrayList();
+        for (int j = 0; j < table.getColumns().size(); j++) {
+            TableColumn col = new TableColumn(table.getColumns().get(j).getName());
+            final int finalJ = j;
+            col.setCellValueFactory(
+                    (Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param ->
+                            new SimpleStringProperty(param.getValue().get(finalJ).toString())
+            );
+            col.setCellFactory(TextFieldTableCell.forTableColumn());
+//            TODO: edit Table cell
+//            col.setOnEditCommit(
+//                    (EventHandler<TableColumn.CellEditEvent<ObservableList, String>>) t -> {
+//                        String newValue = t.getNewValue();
+//                        try {
+//                            final int i = t.getTablePosition().getRow();
+//                            table.setField(i, finalJ, newValue);
+//                        } catch (Exception e) {
+//                            showErrorMessage(e.toString());
+//                        }
+//                    }
+//            );
+            tableView.getColumns().add(col);
+        }
+
+        for (int i = 0; i < table.getRows().size(); i++) {
+            ObservableList<String> row = FXCollections.observableArrayList();
+            for(int j = 0; j < table.getRows().get(i).getValues().size(); j++) {
+                row.add(table.getRows().get(i).get(j).toString());
+            }
+            data.add(row);
+        }
+//        tableView.setEditable(true);
+        tableView.setItems(data);
+    }
+
+    private void showDataBase(String currentTableName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        removeTabsFromInterface();
+        updateDB();
+
+        HashMap<String, Table> tables = currentDB.getTables();
+
+        String currName = currentTableName;
+
+        for (HashMap.Entry<String, Table> entry : tables.entrySet()) {
+            addTableToInterface(entry.getValue());
+
+            if (null == currName) {
+                currName = entry.getKey();
+            }
+        }
+
+        for (Tab tab : tabPane.getTabs()) {
+            if (tab.getText().equals(currName)) {
+                switchInterfaceToTable(currName);
+            }
+        }
+    }
+
+    private void switchInterfaceToTable(String tabName) {
+        Tab tab = null;
+        for (Tab tab1 : tabPane.getTabs()) {
+            if (tab1.getText().equals(tabName)) {
+                tab = tab1;
+                break;
+            }
+        }
+        tabPane.getSelectionModel().select(tab);
     }
 
     private void search() {
@@ -134,12 +210,8 @@ public class MainWindow extends Application {
             Table searchTable = Server.search(tableName, fieldsSearch);
             tmpWindow.close();
 
-            Tab tab = new Tab();
-            tab.setText(searchTable.getName());
-            TableView tableView = new TableView();
-            tab.setContent(tableView);
-            tabPane.getTabs().add(tab);
-            showTable(searchTable, tableView);
+            addTableToInterface(searchTable);
+            switchInterfaceToTable(searchTable.getName());
         });
     }
 
@@ -166,7 +238,9 @@ public class MainWindow extends Application {
 
             createEnumButton.setOnAction(r -> {
                 try {
-                    currColumns.add(ColumnFactory.createColumn(ColumnFactory.makeEnumColumnString(columnName, enumValues.getText())));
+                    currColumns.add(
+                            ColumnFactory.createColumn(
+                                    ColumnFactory.makeEnumColumnString(columnName, enumValues.getText())));
                     tmpWindow.close();
                 }
                 catch (Exception e1) {
@@ -180,7 +254,7 @@ public class MainWindow extends Application {
                 currColumns.add(
                         ColumnFactory.createColumn(
                                 ColumnFactory.makePlainColumnString(
-                                        Attribute.getFullTypeName(className.toString()), columnName)));
+                                        className.toString(), columnName)));
             }
             catch (Exception e1) {
                 e1.printStackTrace();
@@ -191,7 +265,7 @@ public class MainWindow extends Application {
 
     @SuppressWarnings("unchecked")
     private void createTable() {
-        currColumns.clear();
+        currColumns = new ArrayList<>();
 
         Label secondLabel = new Label("Name of table");
         TextField tableNameTextField = new TextField();
@@ -247,6 +321,8 @@ public class MainWindow extends Application {
             int curr = comboBoxes.size() - 1;
             boolean isAdded = addColumnToTable(comboBoxes.get(curr).getValue(), textFields.get(curr).getText());
 
+            System.out.println(isAdded);
+
             if (isAdded) {
                 if (!tableNameTextField.getText().equals("")) {
                     String tableName = tableNameTextField.getText();
@@ -264,62 +340,11 @@ public class MainWindow extends Application {
             }
         });
 
-        newWindow.show();
+       newWindow.show();
     }
 
-    private void showDataBase(String currentTableName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        updateDB();
 
-        HashMap<String, Table> tables = currentDB.getTables();
 
-        String currName = currentTableName;
-
-        for (HashMap.Entry<String, Table> entry : tables.entrySet()) {
-            addTableToInterface(entry.getValue());
-            String tableName = entry.getKey();
-
-            if (null == currName) {
-                currName = tableName;
-            }
-        }
-
-        // TODO: use currentTableName
-    }
-
-    @SuppressWarnings("unchecked")
-    private void showTable(Table table, TableView tableView) {
-        ObservableList<ObservableList> data = FXCollections.observableArrayList();
-        for (int i = 0; i < table.getColumns().size(); i++) {
-            TableColumn col = new TableColumn(table.getColumns().get(i).getName());
-            final int j = i;
-            col.setCellValueFactory(
-                    (Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param ->
-                            new SimpleStringProperty(param.getValue().get(j).toString())
-            );
-            col.setCellFactory(TextFieldTableCell.forTableColumn());
-            col.setOnEditCommit(
-                    (EventHandler<TableColumn.CellEditEvent<ObservableList, String>>) t -> {
-                        String newValue = t.getNewValue();
-                        try {
-                            table.setField(t.getTablePosition().getRow(), j, newValue);
-                        } catch (Exception e) {
-                            showErrorMessage(e.toString());
-                        }
-                    }
-            );
-            tableView.getColumns().add(col);
-        }
-
-        for (int i = 0; i < table.getRows().size(); i++) {
-            ObservableList<String> row = FXCollections.observableArrayList();
-            for(int j = 0; j < table.getRows().get(i).getValues().size(); j++) {
-                row.add(table.getRows().get(i).get(j).toString());
-            }
-            data.add(row);
-        }
-        tableView.setEditable(true);
-        tableView.setItems(data);
-    }
 
     private void addNewRow() {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
@@ -373,7 +398,6 @@ public class MainWindow extends Application {
                 showErrorMessage(ex.toString());
             }
             newWindow.close();
-            closeAllTabs();
             try {
                 showDataBase(null);
             }
@@ -385,15 +409,7 @@ public class MainWindow extends Application {
         newWindow.show();
     }
 
-    private void addTableToInterface(Table table) {
-        Tab tab = new Tab();
-        tab.setText(table.getName());
-        TableView tableView = new TableView();
-        tab.setContent(tableView);
-        tabPane.getTabs().add(tab);
 
-        showTable(table, tableView);
-    }
 
     private static void showErrorMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -403,14 +419,9 @@ public class MainWindow extends Application {
         alert.showAndWait();
     }
 
-    private void initializeTableTab() {
-        tabPane = new TabPane();
-        verticalLayout.getChildren().add(tabPane);
-    }
 
-    private void closeAllTabs() {
-        tabPane.getTabs().clear();
-    }
+
+
 
     public static void main(String[] args) {
         launch(args);
