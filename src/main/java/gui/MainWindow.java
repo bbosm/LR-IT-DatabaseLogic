@@ -130,8 +130,8 @@ public class MainWindow extends Application {
 
         for (int i = 0; i < table.getRows().size(); i++) {
             ObservableList<String> row = FXCollections.observableArrayList();
-            for(int j = 0; j < table.getRows().get(i).getValues().size(); j++) {
-                row.add(table.getRows().get(i).get(j).toString());
+            for(int j = 0; j < table.getColumns().size(); j++) {
+                row.add(table.getCell(i, j).toString());
             }
             data.add(row);
         }

@@ -135,6 +135,10 @@ public class Table {
         rows.get(rowNumber).set(columnNumber, constructField(columnNumber, s));
     }
 
+    public Attribute getCell(int rowNumber, int columnNumber) {
+        return rows.get(rowNumber).get(columnNumber);
+    }
+
     public void addRow(ArrayList<Attribute> values) {
         // TODO: check if values types are as column types
         Row row = new Row(values);

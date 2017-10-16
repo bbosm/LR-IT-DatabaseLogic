@@ -157,10 +157,9 @@ public class TableTest {
         Table res = table.search(search);
 
         assertEquals(1, res.getRows().size());
-        Row resRow = res.getRows().get(0);
-        assertEquals(dateSearchString, resRow.get(0).toString());
-        assertEquals("6", resRow.get(1).toString());
-        assertEquals(enumSearchString, resRow.get(2).toString());
+        assertEquals(dateSearchString, res.getCell(0, 0).toString());
+        assertEquals("6",     res.getCell(0, 1).toString());
+        assertEquals(enumSearchString, res.getCell(0, 2).toString());
     }
 
 
@@ -193,25 +192,25 @@ public class TableTest {
         assertEquals("Red", enumColumn.getValue(0));
         assertEquals("Yellow", enumColumn.getValue(1));
 
-        assertEquals("2017.10.09", table2.getRows().get(0).getValues().get(0).toString());
-        assertEquals("4",          table2.getRows().get(0).getValues().get(1).toString());
-        assertEquals("Red",        table2.getRows().get(0).getValues().get(2).toString());
-        assertEquals("0",          table2.getRows().get(0).getValues().get(2).toFile());
+        assertEquals("2017.10.09", table2.getCell(0, 0).toString());
+        assertEquals("4",          table2.getCell(0, 1).toString());
+        assertEquals("Red",        table2.getCell(0, 2).toString());
+        assertEquals("0",          table2.getCell(0, 2).toFile());
 
-        assertEquals("2017.10.13", table2.getRows().get(1).getValues().get(0).toString());
-        assertEquals("2",          table2.getRows().get(1).getValues().get(1).toString());
-        assertEquals("Yellow",     table2.getRows().get(1).getValues().get(2).toString());
-        assertEquals("1",          table2.getRows().get(1).getValues().get(2).toFile());
+        assertEquals("2017.10.13", table2.getCell(1, 0).toString());
+        assertEquals("2",          table2.getCell(1, 1).toString());
+        assertEquals("Yellow",     table2.getCell(1, 2).toString());
+        assertEquals("1",          table2.getCell(1, 2).toFile());
 
-        assertEquals("2017.10.16", table2.getRows().get(2).getValues().get(0).toString());
-        assertEquals("4",          table2.getRows().get(2).getValues().get(1).toString());
-        assertEquals("Red",        table2.getRows().get(2).getValues().get(2).toString());
-        assertEquals("0",          table2.getRows().get(2).getValues().get(2).toFile());
+        assertEquals("2017.10.16", table2.getCell(2, 0).toString());
+        assertEquals("4",          table2.getCell(2, 1).toString());
+        assertEquals("Red",        table2.getCell(2, 2).toString());
+        assertEquals("0",          table2.getCell(2, 2).toFile());
 
-        assertEquals("2017.10.13", table2.getRows().get(3).getValues().get(0).toString());
-        assertEquals("6",          table2.getRows().get(3).getValues().get(1).toString());
-        assertEquals("Red",        table2.getRows().get(3).getValues().get(2).toString());
-        assertEquals("0",          table2.getRows().get(3).getValues().get(2).toFile());
+        assertEquals("2017.10.13", table2.getCell(3, 0).toString());
+        assertEquals("6",          table2.getCell(3, 1).toString());
+        assertEquals("Red",        table2.getCell(3, 2).toString());
+        assertEquals("0",          table2.getCell(3, 2).toFile());
 
         table2.saveToFile();
     }
