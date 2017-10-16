@@ -135,7 +135,7 @@ public class MainWindow extends Application {
         removeTabsFromInterface();
         ClientLocal.updateDB();
 
-        HashMap<String, Table> tables = ClientLocal.dataBase.getTables();
+        HashMap<String, Table> tables = ClientLocal.getClientDataBase().getTables();
 
         String currName = currentTableName;
 
@@ -170,7 +170,7 @@ public class MainWindow extends Application {
 
         ClientLocal.updateDB();
 
-        Table currTable = ClientLocal.dataBase.getTable(tableName);
+        Table currTable = ClientLocal.getClientDataBase().getTable(tableName);
 
         HBox columnLayout = new HBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -353,7 +353,7 @@ public class MainWindow extends Application {
     private void addNewRow() {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
         String tableName = tab.getText();
-        Table table = ClientLocal.dataBase.getTable(tableName);
+        Table table = ClientLocal.getClientDataBase().getTable(tableName);
 
         VBox mainLayout = new VBox();
         ArrayList<TextField> textFields = new ArrayList<>();

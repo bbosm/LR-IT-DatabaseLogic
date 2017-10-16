@@ -9,11 +9,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class ClientLocal {
-    public static DataBase dataBase = null;
+    private static DataBase clientDataBase = null;
 
     public static void updateDB() {
         try {
-            dataBase = Server.getDB();
+            clientDataBase = Server.dbRequest();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -41,5 +41,9 @@ public class ClientLocal {
             InstantiationException,
             InvocationTargetException {
         Server.editCell(tableName, rowId, columnId, value);
+    }
+
+    public static DataBase getClientDataBase() {
+        return clientDataBase;
     }
 }

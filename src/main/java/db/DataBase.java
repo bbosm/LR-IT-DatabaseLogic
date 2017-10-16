@@ -13,20 +13,12 @@ public class DataBase {
             NoSuchMethodException,
             InvocationTargetException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException,
+            FileNotFoundException {
         this.pathToFile = pathToFile;
 
         try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
-            // first line
-            int tablesSize = Integer.parseInt(br.readLine());
-
-            // other lines
-            tables = new HashMap<>(tablesSize);
-            for (int tableId = 0; tableId < tablesSize; tableId++) {
-                String tableFilePath = br.readLine();
-                Table table = new Table(tableFilePath);
-                tables.put(table.getName(), table);
-            }
+            this.readFromBufferedReader(br);
         } catch (IOException e) {
             tables = new HashMap<>(0);
             try {
@@ -37,19 +29,51 @@ public class DataBase {
         }
     }
 
+    public DataBase(BufferedReader br) throws
+            ClassNotFoundException,
+            NoSuchMethodException,
+            InvocationTargetException,
+            InstantiationException,
+            IllegalAccessException,
+            IOException {
+        this.readFromBufferedReader(br);
+    }
+
+    private void readFromBufferedReader(BufferedReader br) throws
+            ClassNotFoundException,
+            NoSuchMethodException,
+            InvocationTargetException,
+            InstantiationException,
+            IllegalAccessException,
+            IOException {
+        // first line
+        int tablesSize = Integer.parseInt(br.readLine());
+
+        // other lines
+        tables = new HashMap<>(tablesSize);
+        for (int tableId = 0; tableId < tablesSize; tableId++) {
+            String tableFilePath = br.readLine();
+            Table table = new Table(tableFilePath);
+            tables.put(table.getName(), table);
+        }
+    }
+
+    public void writeToPrintWriter(PrintWriter out) throws IOException {
+        // firat line
+        out.println(tables.size());
+
+        // table lines
+        for (Table table : tables.values()) {
+            out.println(table.getPathToFile());
+            table.saveToFile();
+        }
+    }
+
     public void saveToFile(String pathToFile) throws IOException {
         this.pathToFile = pathToFile;
 
-        FileWriter fw = new FileWriter(pathToFile);
-        try(PrintWriter out = new PrintWriter(fw)) {
-            // firat line
-            out.println(tables.size());
-
-            // table lines
-            for (Table table : tables.values()) {
-                out.println(table.getPathToFile());
-                table.saveToFile();
-            }
+        try(PrintWriter out = new PrintWriter(new FileWriter(pathToFile))) {
+            this.writeToPrintWriter(out);
         }
         catch (Exception e) {
             System.out.println(e.toString());

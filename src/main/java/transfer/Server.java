@@ -6,6 +6,7 @@ import db.Row;
 import db.Table;
 import dbtype.Attribute;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -15,24 +16,29 @@ public class Server {
     private static final String dbFolderPath = "";
     private static final String dbFileName = "bd.db";
 
-    private static DataBase dataBase = null;
+    private static DataBase serverDataBase = null;
 
-    public static DataBase getDB() throws
+    public static DataBase dbRequest() throws
             ClassNotFoundException,
             NoSuchMethodException,
             InstantiationException,
             IllegalAccessException,
-            InvocationTargetException {
-        if (null == dataBase)
+            InvocationTargetException,
+            FileNotFoundException {
+        if (null == serverDataBase)
         {
-            dataBase = new DataBase(dbFolderPath + dbFileName);
+            serverDataBase = new DataBase(dbFolderPath + dbFileName);
         }
-        return dataBase;
+        return serverDataBase;
+    }
+
+    public static Table tableRequest(String tableName) {
+        return serverDataBase.getTable(tableName);
     }
 
     private static void saveDb() {
         try {
-            dataBase.saveToFile();
+            serverDataBase.saveToFile();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -42,21 +48,21 @@ public class Server {
     public static void createTable(String tableName, ArrayList<Column> currColumns) {
         String tableFilePath = dbFolderPath + tableName + ".tb";
         Table newTable = new Table(tableFilePath, tableName, currColumns);
-        dataBase.getTables().put(tableName, newTable);
+        serverDataBase.getTables().put(tableName, newTable);
         saveDb();
     }
 
     public static void deleteTable(String tableName) {
-        dataBase.getTables().remove(tableName);
+        serverDataBase.getTables().remove(tableName);
         saveDb();
     }
 
     public static Table search(String tableName, ArrayList<String> fieldsSearch) {
-        return dataBase.getTable(tableName).search(fieldsSearch);
+        return serverDataBase.getTable(tableName).search(fieldsSearch);
     }
 
     public static void addNewRow(String tableName, ArrayList<Attribute> attributes) {
-        dataBase.getTable(tableName).getRows().add(new Row(attributes));
+        serverDataBase.getTable(tableName).getRows().add(new Row(attributes));
         saveDb();
     }
 
@@ -64,7 +70,7 @@ public class Server {
             IllegalAccessException,
             InstantiationException,
             InvocationTargetException {
-        dataBase.getTable(tableName).setCell(rowId, columnId, value);
+        serverDataBase.getTable(tableName).setCell(rowId, columnId, value);
         saveDb();
     }
 }

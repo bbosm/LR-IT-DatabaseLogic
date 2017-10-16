@@ -29,39 +29,78 @@ public class Table {
         this.pathToFile = pathToFile;
 
         try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
-            // first line
-            this.name = br.readLine();
-
-            // second line
-            int rowsSize = 0, columnsSize = 0;
-            String sCurrentLine = br.readLine();
-            String[] firstLineParameters = sCurrentLine.split("\\s+");
-            rowsSize = Integer.parseInt(firstLineParameters[0]);
-            columnsSize = Integer.parseInt(firstLineParameters[1]);
-
-            // column lines
-            columns = new ArrayList<>(columnsSize);
-            for (int columnId = 0; columnId < columnsSize; columnId++) {
-                sCurrentLine = br.readLine();
-                columns.add(ColumnFactory.createColumn(sCurrentLine));
-            }
-
-            // row lines
-            rows = new ArrayList<>(rowsSize);
-            for (int rowId = 0; rowId < rowsSize; rowId++) {
-                sCurrentLine = br.readLine();
-                String[] rowFields = sCurrentLine.split("\\t");
-                ArrayList<Attribute> rowValues = new ArrayList<>(columnsSize);
-
-                for (int columnId = 0; columnId < columnsSize; columnId++) {
-                    rowValues.add(constructField(columnId, rowFields[columnId]));
-                }
-
-                rows.add(new Row(rowValues));
-            }
+            this.readFromBufferedReader(br);
         }
         catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public Table(BufferedReader br) throws
+            NoSuchMethodException,
+            IOException,
+            ClassNotFoundException,
+            IllegalAccessException,
+            InvocationTargetException,
+            InstantiationException {
+        this.pathToFile = null;
+
+        this.readFromBufferedReader(br);
+    }
+
+    private void readFromBufferedReader(BufferedReader br) throws
+            IOException,
+            NoSuchMethodException,
+            ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
+        // first line
+        this.name = br.readLine();
+
+        // second line
+        int rowsSize = 0, columnsSize = 0;
+        String sCurrentLine = br.readLine();
+        String[] firstLineParameters = sCurrentLine.split("\\s+");
+        rowsSize = Integer.parseInt(firstLineParameters[0]);
+        columnsSize = Integer.parseInt(firstLineParameters[1]);
+
+        // column lines
+        columns = new ArrayList<>(columnsSize);
+        for (int columnId = 0; columnId < columnsSize; columnId++) {
+            sCurrentLine = br.readLine();
+            columns.add(ColumnFactory.createColumn(sCurrentLine));
+        }
+
+        // row lines
+        rows = new ArrayList<>(rowsSize);
+        for (int rowId = 0; rowId < rowsSize; rowId++) {
+            sCurrentLine = br.readLine();
+            String[] rowFields = sCurrentLine.split("\\t");
+            ArrayList<Attribute> rowValues = new ArrayList<>(columnsSize);
+
+            for (int columnId = 0; columnId < columnsSize; columnId++) {
+                rowValues.add(constructField(columnId, rowFields[columnId]));
+            }
+
+            rows.add(new Row(rowValues));
+        }
+    }
+
+    public void writeToPrintWriter(PrintWriter out) {
+        // first line
+        out.println(name);
+
+        // second line
+        out.println(rows.size() + " " + columns.size());
+
+        // column lines
+        for (Column column : columns) {
+            String columnLine = column.toString();
+            out.println(columnLine);
+        }
+
+        // row lines
+        for (Row row : rows) {
+            String rowLine = row.toString();
+            out.println(rowLine);
         }
     }
 
@@ -71,23 +110,7 @@ public class Table {
 
         FileWriter fw = new FileWriter(pathToFile);
         try(PrintWriter out = new PrintWriter(fw)) {
-            // first line
-            out.println(name);
-
-            // second line
-            out.println(rows.size() + " " + columns.size());
-
-            // column lines
-            for (Column column : columns) {
-                String columnLine = column.toString();
-                out.println(columnLine);
-            }
-
-            // row lines
-            for (Row row : rows) {
-                String rowLine = row.toString();
-                out.println(rowLine);
-            }
+            this.writeToPrintWriter(out);
         }
         catch (Exception e) {
             System.out.println(e.toString());
