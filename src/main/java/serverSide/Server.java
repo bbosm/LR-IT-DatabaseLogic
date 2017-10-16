@@ -47,6 +47,11 @@ public class Server {
         saveDb();
     }
 
+    public static void deleteTable(String tableName) {
+        dataBase.getTables().remove(tableName);
+        saveDb();
+    }
+
     public static Table search(String tableName, ArrayList<String> fieldsSearch) {
         return dataBase.getTable(tableName).search(fieldsSearch);
     }

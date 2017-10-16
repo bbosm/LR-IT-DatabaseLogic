@@ -7,6 +7,7 @@ public class AttributeEnum extends Attribute {
     private int index;
     private EnumColumn enumColumn;
 
+    @Deprecated
     public AttributeEnum(String s) {
         super(s);
         System.out.println("Wrong usage AttributeEnum, " + s);

@@ -30,7 +30,6 @@ public class MainWindow extends Application {
     private DataBase currentDB;
     private ArrayList<Column> currColumns = null;
 
-
     private final ObservableList<String> availableOptions =
             FXCollections.observableArrayList(
                     "Integer",
@@ -68,6 +67,7 @@ public class MainWindow extends Application {
         MenuItem addNewRowTableMenuItem = new MenuItem("Add New Row");
         addNewRowTableMenuItem.setOnAction(t -> addNewRow());
         MenuItem searchMenuItem = new MenuItem("Search");
+        // TODO: refresh button -> updateDB();
         searchMenuItem.setOnAction(t -> search());
 
         menuTable.getItems().addAll(
@@ -113,7 +113,6 @@ public class MainWindow extends Application {
                             new SimpleStringProperty(param.getValue().get(finalJ).toString())
             );
             col.setCellFactory(TextFieldTableCell.forTableColumn());
-            //TODO: edit Table cell
             col.setOnEditCommit(
                     (EventHandler<TableColumn.CellEditEvent<ObservableList, String>>) t -> {
                         String newValue = t.getNewValue();

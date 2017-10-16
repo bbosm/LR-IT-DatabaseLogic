@@ -6,11 +6,6 @@ public class Column {
     private String attributeShortTypeName;
     private String name;
 
-    public Column(String attributeShortTypeName, String name) throws ClassNotFoundException, NoSuchMethodException {
-        this.attributeShortTypeName = attributeShortTypeName;
-        this.name = name;
-    }
-
     public Column(String s) throws NoSuchMethodException, ClassNotFoundException {
         String[] columnsFields = s.split("\\t");
         this.attributeShortTypeName = columnsFields[0];

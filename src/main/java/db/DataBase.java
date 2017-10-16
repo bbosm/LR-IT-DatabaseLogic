@@ -8,11 +8,6 @@ public class DataBase {
     private String pathToFile;
     private HashMap<String, Table> tables;
 
-    public DataBase(String pathToFile, HashMap<String, Table> tables) {
-        this.pathToFile = pathToFile;
-        this.tables = tables;
-    }
-
     public DataBase(String pathToFile) throws
             ClassNotFoundException,
             NoSuchMethodException,

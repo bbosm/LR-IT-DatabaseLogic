@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 
 public class TableTest {
-    String pathToTable = "D:\\Temp\\bd.db";
+    String pathToTable = "testTable.tb";
     private Table table;
     private final int columnsSize = 3;
 
@@ -43,27 +43,27 @@ public class TableTest {
         table = new Table(pathToTable, "testTable", columns);
 
         ArrayList<Attribute> row = new ArrayList<>(columnsSize);
-        row.add(new AttributeDate("2017.10.9"));
-        row.add(new AttributeInteger(4));
-        row.add(new AttributeEnum("0", columns.get(2)));
+        row.add(table.constructField(0, "2017.10.9"));
+        row.add(table.constructField(1, "4"));
+        row.add(table.constructField(2, "Red"));
         table.addRow(row);
 
         row = new ArrayList<>();
-        row.add(new AttributeDate("2017.10.13"));
-        row.add(new AttributeInteger(2));
-        row.add(new AttributeEnum("1", columns.get(2)));
+        row.add(table.constructField(0, "2017.10.13"));
+        row.add(table.constructField(1, "2"));
+        row.add(table.constructField(2, "Yellow"));
         table.addRow(row);
 
         row = new ArrayList<>();
-        row.add(new AttributeDate("2017.10.16"));
-        row.add(new AttributeInteger("4"));
-        row.add(new AttributeEnum("0", columns.get(2)));
+        row.add(table.constructField(0, "2017.10.16"));
+        row.add(table.constructField(1, "4"));
+        row.add(table.constructField(2, "Red"));
         table.addRow(row);
 
         row = new ArrayList<>();
-        row.add(new AttributeDate("2017.10.13"));
-        row.add(new AttributeInteger(6));
-        row.add(new AttributeEnum("0", columns.get(2)));
+        row.add(table.constructField(0, "2017.10.13"));
+        row.add(table.constructField(1, "6"));
+        row.add(table.constructField(2, "Red"));
         table.addRow(row);
     }
 
