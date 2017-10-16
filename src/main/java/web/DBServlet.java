@@ -20,10 +20,16 @@ public class DBServlet extends HttpServlet {
      * Default constructor. 
      */
     public DBServlet() {
-        // TODO Auto-generated constructor stub
+    	try {
+			Server.dbRequest();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {		
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {	
+    	System.out.println("updateDB");
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		try {

@@ -14,13 +14,13 @@ import transfer.Server;
 /**
  * Servlet implementation class TableServlet
  */
-public class TableServlet extends HttpServlet {
+public class GetTableServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
     /**
      * Default constructor. 
      */
-    public TableServlet() {
+    public GetTableServlet() {
         // TODO Auto-generated constructor stub
     }
     
