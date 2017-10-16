@@ -133,7 +133,7 @@ public class Table {
         return (Attribute)currColumn.getStringConstructor().newInstance(s);
     }
 
-    public void setField(int rowNumber, int columnNumber, String s) throws
+    public void setCell(int rowNumber, int columnNumber, String s) throws
             IllegalAccessException,
             InvocationTargetException,
             InstantiationException {

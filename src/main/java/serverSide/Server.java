@@ -18,7 +18,12 @@ public class Server {
 
     private static DataBase dataBase = null;
 
-    public static DataBase getDB() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public static DataBase getDB() throws
+            ClassNotFoundException,
+            NoSuchMethodException,
+            InstantiationException,
+            IllegalAccessException,
+            InvocationTargetException {
         if (null == dataBase)
         {
             dataBase = new DataBase(dbFolderPath + dbFileName);
@@ -35,7 +40,7 @@ public class Server {
         }
     }
 
-    static public void createTable(String tableName, ArrayList<Column> currColumns) {
+    public static void createTable(String tableName, ArrayList<Column> currColumns) {
         String tableFilePath = dbFolderPath + tableName + ".tb";
         Table newTable = new Table(tableFilePath, tableName, currColumns);
         dataBase.getTables().put(tableName, newTable);
@@ -51,4 +56,11 @@ public class Server {
         saveDb();
     }
 
+    public static void editCell(String tableName, int rowId, int columnId, String value) throws
+            IllegalAccessException,
+            InstantiationException,
+            InvocationTargetException {
+        dataBase.getTable(tableName).setCell(rowId, columnId, value);
+        saveDb();
+    }
 }

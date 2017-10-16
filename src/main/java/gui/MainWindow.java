@@ -92,7 +92,6 @@ public class MainWindow extends Application {
         }
     }
 
-
     private void removeTabsFromInterface() {
         tabPane.getTabs().clear();
     }
@@ -105,6 +104,7 @@ public class MainWindow extends Application {
         tabPane.getTabs().add(tab);
 
         ObservableList<ObservableList> data = FXCollections.observableArrayList();
+
         for (int j = 0; j < table.getColumns().size(); j++) {
             TableColumn col = new TableColumn(table.getColumns().get(j).getName());
             final int finalJ = j;
@@ -113,18 +113,19 @@ public class MainWindow extends Application {
                             new SimpleStringProperty(param.getValue().get(finalJ).toString())
             );
             col.setCellFactory(TextFieldTableCell.forTableColumn());
-//            TODO: edit Table cell
-//            col.setOnEditCommit(
-//                    (EventHandler<TableColumn.CellEditEvent<ObservableList, String>>) t -> {
-//                        String newValue = t.getNewValue();
-//                        try {
-//                            final int i = t.getTablePosition().getRow();
-//                            table.setField(i, finalJ, newValue);
-//                        } catch (Exception e) {
-//                            showErrorMessage(e.toString());
-//                        }
-//                    }
-//            );
+            //TODO: edit Table cell
+            col.setOnEditCommit(
+                    (EventHandler<TableColumn.CellEditEvent<ObservableList, String>>) t -> {
+                        String newValue = t.getNewValue();
+                        try {
+                            final int i = t.getTablePosition().getRow();
+                            table.setCell(i, finalJ, newValue);
+                            Server.editCell(table.getName(), i, finalJ, newValue);
+                        } catch (Exception e) {
+                            showErrorMessage(e.toString());
+                        }
+                    }
+            );
             tableView.getColumns().add(col);
         }
 
@@ -135,7 +136,7 @@ public class MainWindow extends Application {
             }
             data.add(row);
         }
-//        tableView.setEditable(true);
+        tableView.setEditable(true);
         tableView.setItems(data);
     }
 
@@ -342,9 +343,6 @@ public class MainWindow extends Application {
        newWindow.show();
     }
 
-
-
-
     private void addNewRow() {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
         String tableName = tab.getText();
@@ -416,8 +414,6 @@ public class MainWindow extends Application {
         newWindow.show();
     }
 
-
-
     private static void showErrorMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -425,10 +421,6 @@ public class MainWindow extends Application {
 
         alert.showAndWait();
     }
-
-
-
-
 
     public static void main(String[] args) {
         launch(args);
