@@ -1,6 +1,6 @@
 # Our ignores
 /.idea/
-*.xml
+# *.xml
 *.iml
 *.tb
 *.db
