@@ -217,6 +217,8 @@ public class MainWindow extends Application {
         });
     }
 
+    private boolean flagg;
+
     private boolean addColumnToTable(Object className, String columnName)
     {
         if (className == null) {
@@ -229,6 +231,10 @@ public class MainWindow extends Application {
         }
         if (className.toString().equals("Enum")) {
 
+            if (flagg)
+            {
+                return true;
+            }
             VBox tmpLayout = new VBox();
             Button createEnumButton = new Button("Create Enum");
             TextField enumValues = new TextField();
@@ -238,17 +244,24 @@ public class MainWindow extends Application {
             tmpWindow.setScene(new Scene(tmpLayout));
             tmpWindow.show();
 
+
+
             createEnumButton.setOnAction(r -> {
                 try {
+                    flagg = false;
                     currColumns.add(
                             ColumnFactory.createColumn(
                                     ColumnFactory.makeEnumColumnString(columnName, enumValues.getText())));
                     tmpWindow.close();
+                    flagg = true;
+
                 }
                 catch (Exception e1) {
                     e1.printStackTrace();
                 }
             });
+
+            return flagg;
         }
         else
         {
