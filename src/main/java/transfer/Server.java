@@ -1,4 +1,4 @@
-package serverSide;
+package transfer;
 
 import db.Column;
 import db.DataBase;
@@ -6,7 +6,6 @@ import db.Row;
 import db.Table;
 import dbtype.Attribute;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

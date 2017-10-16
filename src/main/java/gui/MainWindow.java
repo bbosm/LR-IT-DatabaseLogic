@@ -1,9 +1,11 @@
 package gui;
 
+import db.Column;
+import db.ColumnFactory;
+import db.Table;
 import dbtype.AttributeEnum;
-import serverSide.Server;
+import transfer.ClientLocal;
 
-import db.*;
 import dbtype.Attribute;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
@@ -27,7 +29,6 @@ import java.util.HashMap;
 public class MainWindow extends Application {
 
     private TabPane tabPane;
-    private DataBase currentDB;
     private ArrayList<Column> currColumns = null;
 
     private final ObservableList<String> availableOptions =
@@ -83,15 +84,6 @@ public class MainWindow extends Application {
         verticalLayout.getChildren().add(tabPane);
     }
 
-    private void updateDB() {
-        try {
-            currentDB = Server.getDB();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private void removeTabsFromInterface() {
         tabPane.getTabs().clear();
     }
@@ -119,7 +111,7 @@ public class MainWindow extends Application {
                         try {
                             final int i = t.getTablePosition().getRow();
                             table.setCell(i, finalJ, newValue);
-                            Server.editCell(table.getName(), i, finalJ, newValue);
+                            ClientLocal.editCell(table.getName(), i, finalJ, newValue);
                         } catch (Exception e) {
                             showErrorMessage(e.toString());
                         }
@@ -141,9 +133,9 @@ public class MainWindow extends Application {
 
     private void showDataBase(String currentTableName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         removeTabsFromInterface();
-        updateDB();
+        ClientLocal.updateDB();
 
-        HashMap<String, Table> tables = currentDB.getTables();
+        HashMap<String, Table> tables = ClientLocal.dataBase.getTables();
 
         String currName = currentTableName;
 
@@ -176,9 +168,9 @@ public class MainWindow extends Application {
     private void search() {
         String tableName = tabPane.getSelectionModel().getSelectedItem().getText();
 
-        updateDB();
+        ClientLocal.updateDB();
 
-        Table currTable = currentDB.getTable(tableName);
+        Table currTable = ClientLocal.dataBase.getTable(tableName);
 
         HBox columnLayout = new HBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -208,7 +200,7 @@ public class MainWindow extends Application {
                 fieldsSearch.add(textFields.get(j).getText());
             }
 
-            Table searchTable = Server.search(tableName, fieldsSearch);
+            Table searchTable = ClientLocal.search(tableName, fieldsSearch);
             tmpWindow.close();
 
             addTableToInterface(searchTable);
@@ -340,7 +332,7 @@ public class MainWindow extends Application {
                 flagg = false;
                 if (!tableNameTextField.getText().equals("")) {
                     String tableName = tableNameTextField.getText();
-                    Server.createTable(tableName, currColumns);
+                    ClientLocal.createTable(tableName, currColumns);
                     newWindow.close();
 
                     try {
@@ -361,7 +353,7 @@ public class MainWindow extends Application {
     private void addNewRow() {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
         String tableName = tab.getText();
-        Table table = currentDB.getTable(tableName);
+        Table table = ClientLocal.dataBase.getTable(tableName);
 
         VBox mainLayout = new VBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -411,8 +403,8 @@ public class MainWindow extends Application {
                 showErrorMessage("Not all values filled");
             }
             try {
-                Server.addNewRow(tableName, attributes);
-                updateDB();
+                ClientLocal.addNewRow(tableName, attributes);
+                ClientLocal.updateDB();
                 switchInterfaceToTable(tableName);
             } catch (Exception ex) {
                 showErrorMessage(ex.toString());
