@@ -323,6 +323,7 @@ public class MainWindow extends Application {
 
             if (isAdded) {
                 HBox _columnCreationLayout = new HBox();
+                flagg = false;
                 ComboBox _comboBox = new ComboBox(availableOptions);
                 comboBoxes.add(_comboBox);
                 TextField _columnNameTextField = new TextField();
@@ -337,10 +338,12 @@ public class MainWindow extends Application {
             boolean isAdded = addColumnToTable(comboBoxes.get(curr).getValue(), textFields.get(curr).getText());
 
             if (isAdded) {
+                flagg = false;
                 if (!tableNameTextField.getText().equals("")) {
                     String tableName = tableNameTextField.getText();
                     Server.createTable(tableName, currColumns);
                     newWindow.close();
+
                     try {
                         showDataBase(tableName);
                     }
