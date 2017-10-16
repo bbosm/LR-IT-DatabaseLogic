@@ -7,12 +7,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
+import java.net.HttpURLConnection;
 
 public class TableTest {
     String pathToTable = "testTable.tb";
@@ -213,5 +220,23 @@ public class TableTest {
         assertEquals("0",          table2.getCell(3, 2).toFile());
 
         table2.saveToFile();
+    }
+
+    private static void sendRequest(HttpURLConnection connection, String requestString) throws IOException {
+        connection.setDoOutput(true);
+        connection.setDoInput(true);
+        connection.setInstanceFollowRedirects(false);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        connection.setRequestProperty("charset", "utf-8");
+        connection.setRequestProperty("Content-Length", Integer.toString(requestString.getBytes().length));
+        connection.setUseCaches(false);
+
+        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+        out.writeBytes(requestString);
+        out.flush();
+        out.close();
+
+        int tmp = connection.getResponseCode();
     }
 }

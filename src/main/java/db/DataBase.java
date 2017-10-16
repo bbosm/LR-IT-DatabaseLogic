@@ -65,7 +65,6 @@ public class DataBase {
         // table lines
         for (Table table : tables.values()) {
             out.println(table.getPathToFile());
-            table.saveToFile();
         }
     }
 
@@ -77,6 +76,10 @@ public class DataBase {
         }
         catch (Exception e) {
             System.out.println(e.toString());
+        }
+
+        for (Table table : tables.values()) {
+            table.saveToFile();
         }
     }
 

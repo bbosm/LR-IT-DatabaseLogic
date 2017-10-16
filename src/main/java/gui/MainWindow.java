@@ -4,7 +4,7 @@ import db.Column;
 import db.ColumnFactory;
 import db.Table;
 import dbtype.AttributeEnum;
-import transfer.ClientLocal;
+import transfer.ClientWebServlet;
 
 import dbtype.Attribute;
 import javafx.application.Application;
@@ -22,6 +22,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public class MainWindow extends Application {
             );
 
     @Override
-    public void start(Stage stage) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void start(Stage stage) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
         StackPane root = new StackPane();
         VBox verticalLayout = new VBox();
 
@@ -111,7 +112,7 @@ public class MainWindow extends Application {
                         try {
                             final int i = t.getTablePosition().getRow();
                             table.setCell(i, finalJ, newValue);
-                            ClientLocal.editCell(table.getName(), i, finalJ, newValue);
+                            ClientWebServlet.editCell(table.getName(), i, finalJ, newValue);
                         } catch (Exception e) {
                             showErrorMessage(e.toString());
                         }
@@ -131,11 +132,11 @@ public class MainWindow extends Application {
         tableView.setItems(data);
     }
 
-    private void showDataBase(String currentTableName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private void showDataBase(String currentTableName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
         removeTabsFromInterface();
-        ClientLocal.updateDB();
+        ClientWebServlet.updateDB();
 
-        HashMap<String, Table> tables = ClientLocal.getClientDataBase().getTables();
+        HashMap<String, Table> tables = ClientWebServlet.getClientDataBase().getTables();
 
         String currName = currentTableName;
 
@@ -168,9 +169,13 @@ public class MainWindow extends Application {
     private void search() {
         String tableName = tabPane.getSelectionModel().getSelectedItem().getText();
 
-        ClientLocal.updateDB();
+        try {
+            ClientWebServlet.updateDB();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        Table currTable = ClientLocal.getClientDataBase().getTable(tableName);
+        Table currTable = ClientWebServlet.getClientDataBase().getTable(tableName);
 
         HBox columnLayout = new HBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -200,7 +205,12 @@ public class MainWindow extends Application {
                 fieldsSearch.add(textFields.get(j).getText());
             }
 
-            Table searchTable = ClientLocal.search(tableName, fieldsSearch);
+            Table searchTable = null;
+            try {
+                searchTable = ClientWebServlet.search(tableName, fieldsSearch);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             tmpWindow.close();
 
             addTableToInterface(searchTable);
@@ -332,7 +342,11 @@ public class MainWindow extends Application {
                 flagg = false;
                 if (!tableNameTextField.getText().equals("")) {
                     String tableName = tableNameTextField.getText();
-                    ClientLocal.createTable(tableName, currColumns);
+                    try {
+                        ClientWebServlet.createTable(tableName, currColumns);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                     newWindow.close();
 
                     try {
@@ -353,7 +367,7 @@ public class MainWindow extends Application {
     private void addNewRow() {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
         String tableName = tab.getText();
-        Table table = ClientLocal.getClientDataBase().getTable(tableName);
+        Table table = ClientWebServlet.getClientDataBase().getTable(tableName);
 
         VBox mainLayout = new VBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -393,9 +407,7 @@ public class MainWindow extends Application {
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        System.out.println(attributes.size());
-                        System.out.println(col.getAttributeShortTypeName());
-//                        showErrorMessage(ex.toString());
+                        showErrorMessage(ex.toString());
                     }
                 }
             }
@@ -403,8 +415,8 @@ public class MainWindow extends Application {
                 showErrorMessage("Not all values filled");
             }
             try {
-                ClientLocal.addNewRow(tableName, attributes);
-                ClientLocal.updateDB();
+                ClientWebServlet.addNewRow(tableName, attributes);
+                ClientWebServlet.updateDB();
                 switchInterfaceToTable(tableName);
             } catch (Exception ex) {
                 showErrorMessage(ex.toString());
