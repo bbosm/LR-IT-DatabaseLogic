@@ -138,7 +138,7 @@ public class MainWindow extends Application {
         removeTabsFromInterface();
         ClientRMI.updateDB();
 
-        /*HashMap<String, Table> tables = ClientRMI.getClientDataBase().getTables();
+        HashMap<String, Table> tables = ClientRMI.getClientDataBase().getTables();
 
         String currName = currentTableName;
 
@@ -154,7 +154,7 @@ public class MainWindow extends Application {
             if (tab.getText().equals(currName)) {
                 switchInterfaceToTable(currName);
             }
-        }*/
+        }
     }
 
     private void switchInterfaceToTable(String tabName) {
