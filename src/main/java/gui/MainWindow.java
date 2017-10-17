@@ -4,7 +4,7 @@ import db.Column;
 import db.ColumnFactory;
 import db.Table;
 import dbtype.AttributeEnum;
-import transfer.ClientWebServlet;
+import transfer.ClientRMI;
 
 import dbtype.Attribute;
 import javafx.application.Application;
@@ -56,6 +56,8 @@ public class MainWindow extends Application {
         stage.setTitle("Database Application");
         stage.setScene(scene);
         stage.show();
+
+        ClientRMI.init();
 
         showDataBase(null);
     }
@@ -112,7 +114,7 @@ public class MainWindow extends Application {
                         try {
                             final int i = t.getTablePosition().getRow();
                             table.setCell(i, finalJ, newValue);
-                            ClientWebServlet.editCell(table.getName(), i, finalJ, newValue);
+                            ClientRMI.editCell(table.getName(), i, finalJ, newValue);
                         } catch (Exception e) {
                             showErrorMessage(e.toString());
                         }
@@ -134,9 +136,9 @@ public class MainWindow extends Application {
 
     private void showDataBase(String currentTableName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
         removeTabsFromInterface();
-        ClientWebServlet.updateDB();
+        ClientRMI.updateDB();
 
-        HashMap<String, Table> tables = ClientWebServlet.getClientDataBase().getTables();
+        /*HashMap<String, Table> tables = ClientRMI.getClientDataBase().getTables();
 
         String currName = currentTableName;
 
@@ -152,7 +154,7 @@ public class MainWindow extends Application {
             if (tab.getText().equals(currName)) {
                 switchInterfaceToTable(currName);
             }
-        }
+        }*/
     }
 
     private void switchInterfaceToTable(String tabName) {
@@ -170,12 +172,13 @@ public class MainWindow extends Application {
         String tableName = tabPane.getSelectionModel().getSelectedItem().getText();
 
         try {
-            ClientWebServlet.updateDB();
-        } catch (IOException e) {
+            ClientRMI.updateDB();
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
 
-        Table currTable = ClientWebServlet.getClientDataBase().getTable(tableName);
+        Table currTable = ClientRMI.getClientDataBase().getTable(tableName);
 
         HBox columnLayout = new HBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -207,8 +210,8 @@ public class MainWindow extends Application {
 
             Table searchTable = null;
             try {
-                searchTable = ClientWebServlet.search(tableName, fieldsSearch);
-            } catch (IOException e1) {
+                searchTable = ClientRMI.search(tableName, fieldsSearch);
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
             tmpWindow.close();
@@ -343,8 +346,8 @@ public class MainWindow extends Application {
                 if (!tableNameTextField.getText().equals("")) {
                     String tableName = tableNameTextField.getText();
                     try {
-                        ClientWebServlet.createTable(tableName, currColumns);
-                    } catch (IOException e1) {
+                        ClientRMI.createTable(tableName, currColumns);
+                    } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                     newWindow.close();
@@ -367,7 +370,7 @@ public class MainWindow extends Application {
     private void addNewRow() {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
         String tableName = tab.getText();
-        Table table = ClientWebServlet.getClientDataBase().getTable(tableName);
+        Table table = ClientRMI.getClientDataBase().getTable(tableName);
 
         VBox mainLayout = new VBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -415,8 +418,8 @@ public class MainWindow extends Application {
                 showErrorMessage("Not all values filled");
             }
             try {
-                ClientWebServlet.addNewRow(tableName, attributes);
-                ClientWebServlet.updateDB();
+                ClientRMI.addNewRow(tableName, attributes);
+                ClientRMI.updateDB();
                 switchInterfaceToTable(tableName);
             } catch (Exception ex) {
                 showErrorMessage(ex.toString());
