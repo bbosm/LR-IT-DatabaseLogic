@@ -1,13 +1,15 @@
 version '1.0'
 
 apply plugin: 'application'
-mainClassName = 'gui.MainWindow'
+
+mainClassName = 'app.ServerApp'
 sourceCompatibility = 1.8
+
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+run {
+	systemProperties 'java.security.policy' : file("policy.all")
 }
