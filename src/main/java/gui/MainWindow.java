@@ -4,7 +4,8 @@ import db.Column;
 import db.ColumnFactory;
 import db.Table;
 import dbtype.AttributeEnum;
-import transfer.ClientWebServlet;
+import transfer.Client;
+import transfer.ClientLocal;
 
 import dbtype.Attribute;
 import javafx.application.Application;
@@ -24,6 +25,7 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -31,6 +33,7 @@ public class MainWindow extends Application {
 
     private TabPane tabPane;
     private ArrayList<Column> currColumns = null;
+    private Client client;
 
     private final ObservableList<String> availableOptions =
             FXCollections.observableArrayList(
@@ -50,6 +53,8 @@ public class MainWindow extends Application {
         Scene scene = new Scene(root, 600, 480);
 
         initUI(verticalLayout);
+
+        client = new ClientLocal();
 
         root.getChildren().add(verticalLayout);
 
@@ -109,12 +114,17 @@ public class MainWindow extends Application {
             col.setOnEditCommit(
                     (EventHandler<TableColumn.CellEditEvent<ObservableList, String>>) t -> {
                         String newValue = t.getNewValue();
+                        final int i = t.getTablePosition().getRow();
                         try {
-                            final int i = t.getTablePosition().getRow();
                             table.setCell(i, finalJ, newValue);
-                            ClientWebServlet.editCell(table.getName(), i, finalJ, newValue);
                         } catch (Exception e) {
-                            showErrorMessage(e.toString());
+                            e.printStackTrace();
+                        }
+
+                        try {
+                            client.editCell(table.getName(), i, finalJ, newValue);
+                        } catch (ConnectException e) {
+                            e.printStackTrace();
                         }
                     }
             );
@@ -132,11 +142,15 @@ public class MainWindow extends Application {
         tableView.setItems(data);
     }
 
-    private void showDataBase(String currentTableName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
+    private void showDataBase(String currentTableName) {
         removeTabsFromInterface();
-        ClientWebServlet.updateDB();
+        try {
+            client.updateDB();
+        } catch (ConnectException e) {
+            e.printStackTrace();
+        }
 
-        HashMap<String, Table> tables = ClientWebServlet.getClientDataBase().getTables();
+        HashMap<String, Table> tables = client.getClientDataBase().getTables();
 
         String currName = currentTableName;
 
@@ -170,12 +184,12 @@ public class MainWindow extends Application {
         String tableName = tabPane.getSelectionModel().getSelectedItem().getText();
 
         try {
-            ClientWebServlet.updateDB();
-        } catch (IOException e) {
+            client.updateDB();
+        } catch (ConnectException e) {
             e.printStackTrace();
         }
 
-        Table currTable = ClientWebServlet.getClientDataBase().getTable(tableName);
+        Table currTable = client.getClientDataBase().getTable(tableName);
 
         HBox columnLayout = new HBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -207,8 +221,8 @@ public class MainWindow extends Application {
 
             Table searchTable = null;
             try {
-                searchTable = ClientWebServlet.search(tableName, fieldsSearch);
-            } catch (IOException e1) {
+                searchTable = client.search(tableName, fieldsSearch);
+            } catch (ConnectException e1) {
                 e1.printStackTrace();
             }
             tmpWindow.close();
@@ -342,19 +356,15 @@ public class MainWindow extends Application {
                 flagg = false;
                 if (!tableNameTextField.getText().equals("")) {
                     String tableName = tableNameTextField.getText();
+
                     try {
-                        ClientWebServlet.createTable(tableName, currColumns);
-                    } catch (IOException e1) {
+                        client.createTable(tableName, currColumns);
+                    } catch (ConnectException e1) {
                         e1.printStackTrace();
                     }
                     newWindow.close();
 
-                    try {
-                        showDataBase(tableName);
-                    }
-                    catch (Exception e1) {
-                        e1.printStackTrace();
-                    }
+                    showDataBase(tableName);
                 } else {
                     showErrorMessage("Empty table name");
                 }
@@ -367,7 +377,7 @@ public class MainWindow extends Application {
     private void addNewRow() {
         Tab tab = tabPane.getSelectionModel().getSelectedItem();
         String tableName = tab.getText();
-        Table table = ClientWebServlet.getClientDataBase().getTable(tableName);
+        Table table = client.getClientDataBase().getTable(tableName);
 
         VBox mainLayout = new VBox();
         ArrayList<TextField> textFields = new ArrayList<>();
@@ -415,19 +425,15 @@ public class MainWindow extends Application {
                 showErrorMessage("Not all values filled");
             }
             try {
-                ClientWebServlet.addNewRow(tableName, attributes);
-                ClientWebServlet.updateDB();
+                client.addNewRow(tableName, attributes);
+                client.updateDB();
                 switchInterfaceToTable(tableName);
-            } catch (Exception ex) {
-                showErrorMessage(ex.toString());
+            } catch (ConnectException e1) {
+                showErrorMessage(e1.toString());
             }
             newWindow.close();
-            try {
-                showDataBase(null);
-            }
-            catch (Exception e1) {
-                e1.printStackTrace();
-            }
+
+            showDataBase(null);
         });
 
         newWindow.show();

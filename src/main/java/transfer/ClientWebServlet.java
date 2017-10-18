@@ -6,35 +6,53 @@ import db.Table;
 import dbtype.Attribute;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class ClientWebServlet {
-    private static final String linkToServer = "http://localhost:8080/mydb";
-    private static DataBase clientDataBase = null;
+public class ClientWebServlet extends Client {
+    private final String linkToServer = "http://localhost:8080/mydb";
 
-    private static void sendRequest(HttpURLConnection connection, String requestString) throws IOException {
+    public ClientWebServlet() {
+        super();
+    }
+
+    private int sendRequest(HttpURLConnection connection, String requestString) throws ConnectException {
         connection.setDoOutput(true);
         connection.setDoInput(true);
         connection.setInstanceFollowRedirects(false);
-        connection.setRequestMethod("POST");
+        try {
+            connection.setRequestMethod("POST");
+        } catch (ProtocolException e) {
+            throw new ConnectException();
+        }
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         connection.setRequestProperty("charset", "utf-8");
         connection.setRequestProperty("Content-Length", Integer.toString(requestString.getBytes().length));
         connection.setUseCaches(false);
 
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.writeBytes(requestString);
-        out.flush();
-        out.close();
+        DataOutputStream out = null;
+        try {
+            out = new DataOutputStream(connection.getOutputStream());
+            out.writeBytes(requestString);
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            throw new ConnectException();
+        }
 
-        int tmp = connection.getResponseCode();
+        int responseCode = 500;
+        try {
+            responseCode = connection.getResponseCode();
+        } catch (IOException e) {
+            throw new ConnectException();
+        }
+        return responseCode;
     }
 
-//    private static String readResponse(HttpURLConnection connection) {
+//    private String readResponse(HttpURLConnection connection) {
 //        StringBuffer response = new StringBuffer();
 //        try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 //            String inputLine;
@@ -43,17 +61,23 @@ public class ClientWebServlet {
 //                response.append(inputLine);
 //            }
 //        } catch (IOException e) {
-//            e.printStackTrace();
+//            throw new ConnectException();
 //        }
 //
 //        return response.toString();
 //    }
 
-    public static void updateDB() throws IOException {
+    public void updateDB() throws ConnectException {
         String requestURL = linkToServer + "/DBServlet";
 
-        URL url = new URL(requestURL);
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        URL url = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(requestURL);
+            connection = (HttpURLConnection)url.openConnection();
+        } catch (IOException e) {
+            throw new ConnectException();
+        }
 
         sendRequest(connection, "");
 
@@ -78,7 +102,7 @@ public class ClientWebServlet {
                 tableNames.add(tableName);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ConnectException();
         }
 
         connection.disconnect();
@@ -86,28 +110,31 @@ public class ClientWebServlet {
         try {
             clientDataBase = new DataBase(new BufferedReader(new StringReader("0")));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ConnectException();
         }
 
         for(String tableName : tableNames) {
             requestURL =  linkToServer + "/GetTableServlet?tableName=" + tableName;
-            url = new URL(requestURL);
-            connection = (HttpURLConnection)url.openConnection();
+            try {
+                url = new URL(requestURL);
+                connection = (HttpURLConnection)url.openConnection();
+            } catch (IOException e) {
+                throw new ConnectException();
+            }
             sendRequest(connection, "");
 
             try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 Table table = new Table(in);
                 clientDataBase.getTables().put(tableName, table);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new ConnectException();
             }
 
             connection.disconnect();
         }
     }
 
-    public static void createTable(String tableName, ArrayList<Column> currColumns) throws
-            IOException {
+    public void createTable(String tableName, ArrayList<Column> currColumns) throws ConnectException {
         String requestURL = linkToServer + "/CreateTableServlet?tableName=" + tableName;
         System.out.println(requestURL);
 
@@ -116,17 +143,23 @@ public class ClientWebServlet {
             stringBuilder.append(column.toString() + "\n");
         }
 
-        URL url = new URL(requestURL);
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        URL url = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(requestURL);
+            connection = (HttpURLConnection)url.openConnection();
+        } catch (IOException e) {
+            throw new ConnectException();
+        }
 
         sendRequest(connection, stringBuilder.toString());
 
         connection.disconnect();
     }
 
-//    public static void deleteTable(String tableName) {}
+    public void deleteTable(String tableName) throws ConnectException {}
 
-    public static Table search(String tableName, ArrayList<String> fieldsSearch) throws IOException {
+    public Table search(String tableName, ArrayList<String> fieldsSearch) throws ConnectException {
         String requestURL = linkToServer + "/SearchServlet?tableName=" + tableName;
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -134,8 +167,14 @@ public class ClientWebServlet {
             stringBuilder.append(fieldSearch + "\n");
         }
 
-        URL url = new URL(requestURL);
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        URL url = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(requestURL);
+            connection = (HttpURLConnection)url.openConnection();
+        } catch (IOException e) {
+            throw new ConnectException();
+        }
 
         sendRequest(connection, stringBuilder.toString());
 
@@ -144,7 +183,7 @@ public class ClientWebServlet {
             table = new Table(in);
             clientDataBase.getTables().put(table.getName(), table);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ConnectException();
         }
 
         connection.disconnect();
@@ -152,37 +191,46 @@ public class ClientWebServlet {
         return table;
     }
 
-    public static void addNewRow(String tableName, ArrayList<Attribute> attributes) throws IOException {
+    public void addNewRow(String tableName, ArrayList<Attribute> attributes) throws ConnectException {
         String requestURL = linkToServer + "/AddNewRowServlet?tableName=" + tableName;
         StringBuilder stringBuilder = new StringBuilder();
         for (Attribute attribute : attributes) {
             stringBuilder.append(attribute.toFile() + "\n");
         }
 
-        URL url = new URL(requestURL);
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        URL url = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(requestURL);
+            connection = (HttpURLConnection)url.openConnection();
+        } catch (IOException e) {
+            throw new ConnectException();
+        }
 
         sendRequest(connection, stringBuilder.toString());
 
         connection.disconnect();
     }
 
-    public static void editCell(String tableName, int rowId, int columnId, String value) throws
-            IllegalAccessException,
-            InstantiationException,
-            InvocationTargetException, IOException {
+    public void editCell(String tableName, int rowId, int columnId, String value) throws ConnectException {
         String requestURL = linkToServer + "/EditCellServlet?tableName=" + tableName
                 + "&rowId=" + rowId + "&columnId" + columnId;
 
-        URL url = new URL(requestURL);
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        URL url = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(requestURL);
+            connection = (HttpURLConnection)url.openConnection();
+        } catch (IOException e) {
+            throw new ConnectException();
+        }
 
         sendRequest(connection, value);
 
         connection.disconnect();
     }
 
-    public static DataBase getClientDataBase() {
+    public DataBase getClientDataBase() {
         return clientDataBase;
     }
 }
