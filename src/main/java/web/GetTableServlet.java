@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import db.Table;
-import transfer.Server;
 
 /**
  * Servlet implementation class TableServlet
@@ -26,7 +25,7 @@ public class GetTableServlet extends HttpServlet {
     
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
     	String tableName = request.getParameter("tableName");
-		Table responseTable = Server.tableRequest(tableName);
+		Table responseTable = Common.server.tableRequest(tableName);
 		
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();

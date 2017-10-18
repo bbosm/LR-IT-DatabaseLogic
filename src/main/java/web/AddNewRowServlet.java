@@ -1,6 +1,7 @@
 package web;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import db.Table;
 import dbtype.Attribute;
-import transfer.Server;
 
 /**
  * Servlet implementation class AddNewRowServlet
@@ -42,7 +42,13 @@ public class AddNewRowServlet extends HttpServlet {
     	
 		String tableName = request.getParameter("tableName");
 		
-		Table table = Server.tableRequest(tableName);
+		Table table = null;
+		try {
+			table = Common.server.tableRequest(tableName);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		ArrayList<Attribute> attributes = new ArrayList<>(values.size());
 		for (int i = 0; i < values.size(); i++) {
 			try {
@@ -53,7 +59,12 @@ public class AddNewRowServlet extends HttpServlet {
 			}
 		}
 		
-		Server.addNewRow(tableName, attributes);
+		try {
+			Common.server.addNewRow(tableName, attributes);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 	/**

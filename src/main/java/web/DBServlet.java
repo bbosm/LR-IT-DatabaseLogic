@@ -1,5 +1,6 @@
 package web;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -7,8 +8,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import transfer.Server;
 
 /**
  * Servlet implementation class DBServlet
@@ -21,22 +20,17 @@ public class DBServlet extends HttpServlet {
      */
     public DBServlet() {
     	try {
-			Server.dbRequest();
-		} catch (Exception e) {
+			Common.server.dbRequest();
+		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
     
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {	
-    	System.out.println("updateDB");
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
-		try {
-			Server.dbRequest().writeToPrintWriter(out);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		Common.server.dbRequest().writeToPrintWriter(out);
     }
 
 	/**

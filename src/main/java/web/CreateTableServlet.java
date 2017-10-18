@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import javax.servlet.ServletException;
@@ -14,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import db.Column;
 import db.ColumnFactory;
-import transfer.Server;
 
 /**
  * Servlet implementation class CreateTableServlet
@@ -32,8 +30,8 @@ public class CreateTableServlet extends HttpServlet {
     
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) {
     	try {
-			Server.dbRequest();
-		} catch (Exception e1) {
+			Common.server.dbRequest();
+		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
@@ -55,7 +53,12 @@ public class CreateTableServlet extends HttpServlet {
     	
 		String tableName = request.getParameter("tableName");
 		
-		Server.createTable(tableName, columns);
+		try {
+			Common.server.createTable(tableName, columns);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 	/**

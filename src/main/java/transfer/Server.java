@@ -13,64 +13,63 @@ import java.util.ArrayList;
 
 public class Server {
     // ends with File.separator or empty ("") String
-    private static final String dbFolderPath = "";
-    private static final String dbFileName = "bd.db";
+    protected final String dbFolderPath = "";
+    protected final String dbFileName = "bd.db";
 
-    private static DataBase serverDataBase = null;
+    protected DataBase serverDataBase = null;
 
-    public static DataBase dbRequest() throws
-            ClassNotFoundException,
-            NoSuchMethodException,
-            InstantiationException,
-            IllegalAccessException,
-            InvocationTargetException,
-            FileNotFoundException {
+    public DataBase dbRequest() throws FileNotFoundException {
         if (null == serverDataBase)
         {
-            serverDataBase = new DataBase(dbFolderPath + dbFileName);
+            try {
+                serverDataBase = new DataBase(dbFolderPath + dbFileName);
+            } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException
+                    | IllegalAccessException e) {
+                throw new FileNotFoundException();
+            }
         }
         return serverDataBase;
     }
 
-    public static Table tableRequest(String tableName) {
+    public Table tableRequest(String tableName) throws FileNotFoundException {
         return serverDataBase.getTable(tableName);
     }
 
-    private static void saveDb() {
+    protected void saveDb() throws FileNotFoundException {
         try {
             serverDataBase.saveToFile();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new FileNotFoundException();
         }
     }
 
-    public static void createTable(String tableName, ArrayList<Column> currColumns) {
+    public void createTable(String tableName, ArrayList<Column> currColumns) throws FileNotFoundException {
         String tableFilePath = dbFolderPath + tableName + ".tb";
         Table newTable = new Table(tableFilePath, tableName, currColumns);
         serverDataBase.getTables().put(tableName, newTable);
         saveDb();
     }
 
-    public static void deleteTable(String tableName) {
+    public void deleteTable(String tableName) throws FileNotFoundException {
         serverDataBase.getTables().remove(tableName);
         saveDb();
     }
 
-    public static Table search(String tableName, ArrayList<String> fieldsSearch) {
+    public Table search(String tableName, ArrayList<String> fieldsSearch) throws FileNotFoundException {
         return serverDataBase.getTable(tableName).search(fieldsSearch);
     }
 
-    public static void addNewRow(String tableName, ArrayList<Attribute> attributes) {
+    public void addNewRow(String tableName, ArrayList<Attribute> attributes) throws FileNotFoundException {
         serverDataBase.getTable(tableName).getRows().add(new Row(attributes));
         saveDb();
     }
 
-    public static void editCell(String tableName, int rowId, int columnId, String value) throws
-            IllegalAccessException,
-            InstantiationException,
-            InvocationTargetException {
-        serverDataBase.getTable(tableName).setCell(rowId, columnId, value);
+    public void editCell(String tableName, int rowId, int columnId, String value) throws FileNotFoundException {
+        try {
+            serverDataBase.getTable(tableName).setCell(rowId, columnId, value);
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            throw new FileNotFoundException();
+        }
         saveDb();
     }
 }

@@ -1,6 +1,7 @@
 package web;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -8,8 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import transfer.Server;
 
 /**
  * Servlet implementation class EditCellServlet
@@ -39,8 +38,8 @@ public class EditCellServlet extends HttpServlet {
 		int columnId = Integer.parseInt(request.getParameter("columnId"));
 		
 		try {
-			Server.editCell(tableName, rowId, columnId, value);
-		} catch (Exception e) {
+			Common.server.editCell(tableName, rowId, columnId, value);
+		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

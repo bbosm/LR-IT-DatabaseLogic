@@ -1,6 +1,7 @@
 package web;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import db.Table;
-import transfer.Server;
 
 /**
  * Servlet implementation class SearchServlet
@@ -41,7 +41,13 @@ public class SearchServlet extends HttpServlet {
     	
 		String tableName = request.getParameter("tableName");
 		
-		Table searchResult = Server.search(tableName, fieldsSearch);
+		Table searchResult = null;
+		try {
+			searchResult = Common.server.search(tableName, fieldsSearch);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		response.setContentType("text/html;charset=UTF-8");
 		try {
