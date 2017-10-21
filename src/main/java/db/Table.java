@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class Table implements Serializable {
-    private String pathToFile;
+    private transient String pathToFile;
     private String name;
     private ArrayList<Row> rows;
     private ArrayList<Column> columns;
