@@ -21,7 +21,6 @@ public class ClientRMI {
                 System.setSecurityManager(new SecurityManager());
             }
             server = (Server)Naming.lookup("rmi://localhost/SERVER");
-            System.out.println("All right");
         }
         catch (Exception e) {
             e.printStackTrace();

@@ -2,9 +2,10 @@ package db;
 
 import dbtype.Attribute;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Row {
+public class Row implements Serializable {
     private ArrayList<Attribute> values;
 
     public Row(ArrayList<Attribute> values) {

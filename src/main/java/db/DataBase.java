@@ -4,7 +4,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-public class DataBase {
+public class DataBase implements Serializable {
     private String pathToFile;
     private HashMap<String, Table> tables;
 
