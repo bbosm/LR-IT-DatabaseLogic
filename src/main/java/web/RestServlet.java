@@ -44,7 +44,7 @@ public class RestServlet extends HttpServlet {
     }
     
     private static String[] parseUrl(String requestUrl) {
-    	String requestString = requestUrl.substring(Common.serverLink.length() + "rest/".length());
+    	String requestString = requestUrl.substring(Common.serverLink.length() + "/rest".length() + 1);
     	return requestString.split("/");
     }
 
