@@ -23,6 +23,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import transfer.ClientRestServlet;
+import transfer.ClientWebServlet;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -55,7 +56,7 @@ public class MainWindow extends Application {
 
         initUI(verticalLayout);
 
-        client = new ClientRestServlet();
+        client = new ClientWebServlet();
 
         root.getChildren().add(verticalLayout);
 

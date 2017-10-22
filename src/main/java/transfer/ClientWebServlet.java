@@ -13,7 +13,9 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class ClientWebServlet extends Client {
-    private final String linkToServer = "http://localhost:8080/mydb";
+    private final String linkToServer =
+            "http://mydb.us-east-2.elasticbeanstalk.com";
+//            "http://localhost:8080/mydb";
 
     public ClientWebServlet() {
         super();
