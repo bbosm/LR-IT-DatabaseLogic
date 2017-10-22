@@ -14,9 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ClientRestServlet extends Client {
-    private final String linkToServer =
-            "http://mydb.us-east-2.elasticbeanstalk.com/rest";
-//            "http://localhost:8080/mydb/rest";
+    private final String linkToServer = "http://localhost:8080/mydb/rest";
 
     public ClientRestServlet() {
         super();
@@ -28,6 +26,9 @@ public class ClientRestServlet extends Client {
         } catch (ProtocolException e) {
             throw new ConnectException();
         }
+
+        System.out.println(requestMethod + " " + connection.getURL().toString());
+        System.out.println(requestString);
 
         if (requestMethod.equals("GET")) {
             connection.setDoOutput(false);
