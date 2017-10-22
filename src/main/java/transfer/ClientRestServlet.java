@@ -11,9 +11,12 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ClientRestServlet extends Client {
-    private final String linkToServer = "http://localhost:8080/mydb/rest";
+    private final String linkToServer =
+            "http://mydb.us-east-2.elasticbeanstalk.com/rest";
+//            "http://localhost:8080/mydb/rest";
 
     public ClientRestServlet() {
         super();
@@ -22,7 +25,6 @@ public class ClientRestServlet extends Client {
     private int sendRequest(HttpURLConnection connection, String requestMethod, String requestString) throws ConnectException {
         try {
             connection.setRequestMethod(requestMethod);
-            System.out.println("request method " + requestMethod);
         } catch (ProtocolException e) {
             throw new ConnectException();
         }
@@ -59,13 +61,11 @@ public class ClientRestServlet extends Client {
         } catch (IOException e) {
             throw new ConnectException();
         }
-        System.out.println(responseCode);
         return responseCode;
     }
 
     public void updateDB() throws ConnectException {
         String requestURL = linkToServer + "/db";
-        System.out.println(requestURL);
 
         URL url = null;
         HttpURLConnection connection = null;
@@ -105,7 +105,7 @@ public class ClientRestServlet extends Client {
         connection.disconnect();
 
         try {
-            clientDataBase = new DataBase(new BufferedReader(new StringReader("0")));
+            clientDataBase = new DataBase(null, new HashMap<>());
         } catch (Exception e) {
             throw new ConnectException();
         }
@@ -133,7 +133,6 @@ public class ClientRestServlet extends Client {
 
     public void createTable(String tableName, ArrayList<Column> currColumns) throws ConnectException {
         String requestURL = linkToServer + "/db";
-        System.out.println(requestURL);
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(tableName + "\n");
