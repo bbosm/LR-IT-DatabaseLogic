@@ -11,18 +11,13 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.rmi.*;
-import java.rmi.server.UnicastRemoteObject;
+import javax.rmi.PortableRemoteObject;
 
 public class ServerImpl
-        extends UnicastRemoteObject implements Server {
+        extends PortableRemoteObject implements Server {
 
-    public ServerImpl(String name) throws RemoteException {
-        try {
-            Naming.rebind(name, this);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+    public ServerImpl() throws RemoteException {
+        super();
     }
 
     // ends with File.separator or empty ("") String

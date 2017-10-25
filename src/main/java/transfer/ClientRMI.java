@@ -5,22 +5,40 @@ import db.DataBase;
 import db.Table;
 import dbtype.Attribute;
 
+import javax.naming.InitialContext;
+import javax.rmi.PortableRemoteObject;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import java.rmi.*;
+import java.util.Properties;
 
 public class ClientRMI {
 
     private static DataBase clientDataBase = null;
     private static Server server = null;
 
+    static final String CONTEXT_NAME = "java.naming.factory.initial";
+    static final String IIOP_STRING  = "com.sun.jndi.cosnaming.CNCtxFactory";
+
+    static final String URL_NAME = "java.naming.provider.url";
+    static final String IIOP_URL_STRING  = "iiop://localhost:8080";
+
+    static final String OBJECT_NAME = "SERVER";
+
     public static void init() {
         try {
-            if (null == System.getSecurityManager()) {
-                System.setSecurityManager(new SecurityManager());
+            Properties iiopProperties = new Properties();
+            iiopProperties.put(CONTEXT_NAME, IIOP_STRING);
+            iiopProperties.put(URL_NAME, IIOP_URL_STRING);
+            InitialContext iiopContext = new InitialContext(iiopProperties);
+
+            server = (Server)PortableRemoteObject.narrow(iiopContext.lookup(OBJECT_NAME), Server.class);
+
+            if (null == server) {
+                System.out.println("ololo");
             }
-            server = (Server)Naming.lookup("rmi://localhost/SERVER");
+
         }
         catch (Exception e) {
             e.printStackTrace();
