@@ -1,1 +1,0 @@
-Empty txt file for git to create resources folder

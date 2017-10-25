@@ -16,35 +16,31 @@ import db.Column;
 import db.ColumnFactory;
 import db.Table;
 import dbtype.Attribute;
+import transfer.Server;
 
+/**
+ * Servlet implementation class RestServlet
+ */
 public class RestServlet extends HttpServlet {
-	// GET:
-	// getDB 	db
-	// getTable db/tableName
-	// search 	db/tableName/search
-	//
-	// POST:
-	// createTable	db
-	// addNewRow	db/tableName
-	//
-	// PUT:
-	// editCell		db/tableName
-	
 	private static final long serialVersionUID = 1L;
+
+	public static final String serverLink = "http://localhost:8080/mydb";
+	private static Server server = new Server();
        
     public RestServlet() {
         super();
         
         try {
-			Common.server.getDB();
+			server.getDB();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
     }
-    
+
     private static String[] parseUrl(String requestUrl) {
-    	String requestString = requestUrl.substring(Common.serverLink.length() + "rest/".length());
+    	String requestString = requestUrl.substring(serverLink.length() + "/rest".length() + 1);
     	return requestString.split("/");
     }
 
@@ -59,11 +55,11 @@ public class RestServlet extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		
 		if (urlParameters.length == 1) { // getDB
-			Common.server.getDB().writeToPrintWriter(out);
+			server.getDB().writeToPrintWriter(out);
 		}
 		else if (urlParameters.length == 2) { // get table
 			String tableName = urlParameters[1];
-			Common.server.getTable(tableName).writeToPrintWriter(out);
+			server.getTable(tableName).writeToPrintWriter(out);
 		}
 		else if (urlParameters[2].equals("search")) { // search in table
 			String tableName = urlParameters[1];
@@ -77,7 +73,7 @@ public class RestServlet extends HttpServlet {
 	    	
 	    	Table searchResult = null;
 			try {
-				searchResult = Common.server.search(tableName, fieldsSearch);
+				searchResult = server.search(tableName, fieldsSearch);
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -113,7 +109,7 @@ public class RestServlet extends HttpServlet {
 	        }
 			
 	    	try {
-				Common.server.createTable(tableName, columns);
+				server.createTable(tableName, columns);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -134,7 +130,7 @@ public class RestServlet extends HttpServlet {
 	    	
 	    	Table table = null;
 	    	try {
-				table = Common.server.getTable(tableName);
+				table = server.getTable(tableName);
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -151,7 +147,7 @@ public class RestServlet extends HttpServlet {
 			}
 			
 			try {
-				Common.server.addNewRow(tableName, attributes);
+				server.addNewRow(tableName, attributes);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -181,7 +177,7 @@ public class RestServlet extends HttpServlet {
         }
     	
 		try {
-			Common.server.editCell(tableName, rowId, columnId, value);
+			server.editCell(tableName, rowId, columnId, value);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -191,5 +187,6 @@ public class RestServlet extends HttpServlet {
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 	}
+
 
 }

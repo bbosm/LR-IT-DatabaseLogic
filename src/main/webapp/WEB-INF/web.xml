@@ -5,71 +5,11 @@
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
   <servlet>
-  	<servlet-name>GetTableServlet</servlet-name>
-  	<display-name>GetTableServlet</display-name>
-  	<description></description>
-  	<servlet-class>web.GetTableServlet</servlet-class>
-  </servlet>
-  <servlet>
-  	<servlet-name>DBServlet</servlet-name>
-  	<display-name>DBServlet</display-name>
-  	<description></description>
-  	<servlet-class>web.DBServlet</servlet-class>
-  </servlet>
-  <servlet>
-  	<servlet-name>CreateTableServlet</servlet-name>
-  	<display-name>CreateTableServlet</display-name>
-  	<description></description>
-  	<servlet-class>web.CreateTableServlet</servlet-class>
-  </servlet>
-  <servlet>
-  	<servlet-name>SearchServlet</servlet-name>
-  	<display-name>SearchServlet</display-name>
-  	<description></description>
-  	<servlet-class>web.SearchServlet</servlet-class>
-  </servlet>
-  <servlet>
-  	<servlet-name>AddNewRowServlet</servlet-name>
-  	<display-name>AddNewRowServlet</display-name>
-  	<description></description>
-  	<servlet-class>web.AddNewRowServlet</servlet-class>
-  </servlet>
-  <servlet>
-  	<servlet-name>EditCellServlet</servlet-name>
-  	<display-name>EditCellServlet</display-name>
-  	<description></description>
-  	<servlet-class>web.EditCellServlet</servlet-class>
-  </servlet>
-  <servlet>
   	<servlet-name>RestServlet</servlet-name>
   	<display-name>RestServlet</display-name>
   	<description></description>
   	<servlet-class>web.RestServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-  	<servlet-name>GetTableServlet</servlet-name>
-  	<url-pattern>/GetTableServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-  	<servlet-name>DBServlet</servlet-name>
-  	<url-pattern>/DBServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-  	<servlet-name>CreateTableServlet</servlet-name>
-  	<url-pattern>/CreateTableServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-  	<servlet-name>SearchServlet</servlet-name>
-  	<url-pattern>/SearchServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-  	<servlet-name>AddNewRowServlet</servlet-name>
-  	<url-pattern>/AddNewRowServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-  	<servlet-name>EditCellServlet</servlet-name>
-  	<url-pattern>/EditCellServlet</url-pattern>
-  </servlet-mapping>
   <servlet-mapping>
   	<servlet-name>RestServlet</servlet-name>
   	<url-pattern>/rest/*</url-pattern>
