@@ -1,4 +1,8 @@
 #!/bin/bash
 
+#tnameserv -ORBInitialPort 8080
+
 cd build/classes/main
-rmiregistry&
+rmic -iiop transfer.ServerImpl
+
+
