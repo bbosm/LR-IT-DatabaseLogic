@@ -8,6 +8,11 @@ public class DataBase {
     private String pathToFile;
     private HashMap<String, Table> tables;
 
+    public DataBase(String pathToFile, HashMap<String, Table> tables) {
+        this.pathToFile = pathToFile;
+        this.tables = tables;
+    }
+
     public DataBase(String pathToFile) throws
             ClassNotFoundException,
             NoSuchMethodException,
@@ -59,7 +64,7 @@ public class DataBase {
     }
 
     public void writeToPrintWriter(PrintWriter out) throws IOException {
-        // firat line
+        // first line
         out.println(tables.size());
 
         // table lines

@@ -1,18 +1,20 @@
-﻿# mydb
-Кузенко 
-https://magistrs2016.github.io/
+﻿# mydb  
+Кузенко  
+https://magistrs2016.github.io/  
 
-
-
-# To run:
+# To run:  
 Download & Install JRE, JDK, Git  
-Download & Install Intelij IDEA Community
+Download & Install Eclipse for Java EE Oxygen  
 
-  
-Intelij IDEA start window: Configure > Project Defaults > Project Structure - point SDK to JRE  
-Open - folder with project marked with gradle icon  
-Select 1, 2 and 4 checkboxes (don't touch anothers), press OK  
-If gradle sync failed - close project, delete .idea/modules, .idea/modules.xml, mydb.iml  
-View - Tool Windows - Gradle - Tasks:  
-  Save application - run as "App" configuration  
-  Save verification - test as "Test" configuration  
+# Server (Eclipse)  
+Open IDE and create workspace  
+File - New - Maven Project  
+Press Next, then choose maven-archetype-webapp, press Next  
+Group Id and Artifact Id = mydb, Finish  
+Project properties - Java Build Path - Source: remove anothers, leave only mydb/src/main/java, Apply  
+Project properties - Project Facets - Runtimes: check (or add new) Apache Tomcat 8.0, Apply and Close  
+Copy repository (whole mydb folder) into workspace, with replace  
+Project: right click - refresh  
+Markers - Java Problems - right click on first one - Quick Fix - Change JRE to 1.7 - Finish  
+Markers - Faceted Project Problem - right click on first one - Quick Fix - change to Java 1.7 - Finish  
+Project - Run As - Run on Server  
