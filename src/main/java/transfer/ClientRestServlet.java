@@ -6,10 +6,7 @@ import db.Table;
 import dbtype.Attribute;
 
 import java.io.*;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -32,19 +29,14 @@ public class ClientRestServlet extends Client {
 
         if (requestMethod.equals("GET")) {
             connection.setDoOutput(false);
-            connection.setDoInput(true);
         } else {
             connection.setDoOutput(true);
-//            connection.setDoInput(true);
 
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Type", "text/plain");
             connection.setRequestProperty("charset", "utf-8");
-            connection.setRequestProperty("Content-Length", Integer.toString(requestString.getBytes().length));
-            connection.setUseCaches(false);
 
-            DataOutputStream out = null;
             try {
-                out = new DataOutputStream(connection.getOutputStream());
+                DataOutputStream out = new DataOutputStream(connection.getOutputStream());
                 out.writeBytes(requestString);
                 out.flush();
                 out.close();
@@ -53,14 +45,11 @@ public class ClientRestServlet extends Client {
             }
         }
 
-        connection.setInstanceFollowRedirects(false);
-
-        int responseCode = 500;
+        int responseCode = 0;
         try {
-            connection.connect();
             responseCode = connection.getResponseCode();
         } catch (IOException e) {
-            throw new ConnectException();
+            e.printStackTrace();
         }
         return responseCode;
     }
@@ -158,23 +147,28 @@ public class ClientRestServlet extends Client {
     public void deleteTable(String tableName) throws ConnectException {}
 
     public Table search(String tableName, ArrayList<String> fieldsSearch) throws ConnectException {
-        String requestURL = linkToServer + "/db/" + tableName + "/search";
+        StringBuilder requestURL = new StringBuilder();
+        requestURL.append(linkToServer + "/db/" + tableName + "/search");
 
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String fieldSearch : fieldsSearch) {
-            stringBuilder.append(fieldSearch + "\n");
+        try {
+            requestURL.append("?p=" + URLEncoder.encode(fieldsSearch.get(0), "UTF-8"));
+            for (int i = 1; i < fieldsSearch.size(); i++) {
+                requestURL.append("&p=" + URLEncoder.encode(fieldsSearch.get(i), "UTF-8"));
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
 
         URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(requestURL);
+            url = new URL(requestURL.toString());
             connection = (HttpURLConnection)url.openConnection();
         } catch (IOException e) {
             throw new ConnectException();
         }
 
-        sendRequest(connection, "GET", stringBuilder.toString());
+        sendRequest(connection, "GET", "");
 
         Table table = null;
         try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {

@@ -18,7 +18,7 @@ public class Server {
 
     protected DataBase serverDataBase = null;
 
-    public DataBase dbRequest() throws FileNotFoundException {
+    public DataBase getDB() throws FileNotFoundException {
         if (null == serverDataBase)
         {
             try {
@@ -31,7 +31,7 @@ public class Server {
         return serverDataBase;
     }
 
-    public Table tableRequest(String tableName) throws FileNotFoundException {
+    public Table getTable(String tableName) throws FileNotFoundException {
         return serverDataBase.getTable(tableName);
     }
 

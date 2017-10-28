@@ -428,7 +428,6 @@ public class MainWindow extends Application {
             }
             try {
                 client.addNewRow(tableName, attributes);
-                client.updateDB();
                 switchInterfaceToTable(tableName);
             } catch (ConnectException e1) {
                 showErrorMessage(e1.toString());

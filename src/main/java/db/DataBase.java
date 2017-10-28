@@ -64,7 +64,7 @@ public class DataBase {
     }
 
     public void writeToPrintWriter(PrintWriter out) throws IOException {
-        // firat line
+        // first line
         out.println(tables.size());
 
         // table lines

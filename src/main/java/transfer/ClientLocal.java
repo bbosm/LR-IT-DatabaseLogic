@@ -20,7 +20,7 @@ public class ClientLocal extends Client {
 
     public void updateDB() throws ConnectException {
         try {
-            clientDataBase = server.dbRequest();
+            clientDataBase = server.getDB();
         }
         catch (FileNotFoundException e) {
             throw new ConnectException();
