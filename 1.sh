@@ -2,7 +2,7 @@
 
 #tnameserv -ORBInitialPort 8080
 
-cd build/classes/main
+cd build/classes/java/main
 rmic -iiop transfer.ServerImpl
 
 
