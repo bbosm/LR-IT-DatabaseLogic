@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd build/classes/main
-rmic -iiop transfer.ServerImpl
+cd build/classes/java/main
+rmic -iiop transfer.Server
 
 

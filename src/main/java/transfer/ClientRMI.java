@@ -86,9 +86,20 @@ public class ClientRMI {
     }
 
     public static void createTable(String tableName, ArrayList<Column> currColumns) {
+        System.out.println(currColumns);
         Table table = new Table(null, tableName, currColumns);
+
+        StringWriter out = new StringWriter();
+        PrintWriter writer = new PrintWriter(out);
+
         try {
-            server.createTable(table.toString());
+            table.writeToPrintWriter(writer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            server.createTable(out.toString());
         } catch (RemoteException e) {
             e.printStackTrace();
         }

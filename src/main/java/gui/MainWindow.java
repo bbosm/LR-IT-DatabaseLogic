@@ -114,7 +114,7 @@ public class MainWindow extends Application {
                         try {
                             final int i = t.getTablePosition().getRow();
                             table.setCell(i, finalJ, newValue);
-                            ClientRMI.editCell(table.getName(), i, finalJ, newValue);
+//                            ClientRMI.editCell(table.getName(), i, finalJ, newValue);
                         } catch (Exception e) {
                             showErrorMessage(e.toString());
                         }
