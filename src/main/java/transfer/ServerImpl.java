@@ -5,6 +5,7 @@ import dbtype.Attribute;
 
 import javax.rmi.PortableRemoteObject;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -24,27 +25,53 @@ public class ServerImpl
 
 
     public String dbRequest() throws NoSuchMethodException, InstantiationException, FileNotFoundException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
-        return serverMaster.getDB().toString();
+        StringWriter out = new StringWriter();
+        PrintWriter writer = new PrintWriter(out);
+
+        try {
+            serverMaster.getDB().writeToPrintWriter(writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return out.toString();
     }
 
     public String tableRequest(String tableName) {
+        StringWriter out = new StringWriter();
+        PrintWriter writer = new PrintWriter(out);
+
         try {
-            return serverMaster.getTable(tableName).toString();
-        } catch (FileNotFoundException e) {
+            serverMaster.getTable(tableName).writeToPrintWriter(writer);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return "";
+
+        return out.toString();
     }
 
     public void createTable(String str) {
-        String[] inputLines = str.split("\\r?\\n");
+        String[] inputLines = str.split("\\n");
 
+        // first line
         String tableName = inputLines[0];
-        ArrayList<Column> columns = new ArrayList<>();
-        for (int i = 1; i < inputLines.length; i++) {
+
+        // second line
+        int rowsSize = 0, columnsSize = 0;
+        String sCurrentLine = inputLines[1];
+        String[] firstLineParameters = sCurrentLine.split("\\s+");
+        rowsSize = Integer.parseInt(firstLineParameters[0]);
+        columnsSize = Integer.parseInt(firstLineParameters[1]);
+
+        // column lines
+        ArrayList<Column> columns = new ArrayList<>(columnsSize);
+        for (int columnId = 0; columnId < columnsSize; columnId++) {
+            sCurrentLine = inputLines[columnId + 2];
             try {
-                columns.add(ColumnFactory.createColumn(inputLines[i]));
-            } catch (NoSuchMethodException | ClassNotFoundException e) {
+                columns.add(ColumnFactory.createColumn(sCurrentLine));
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }

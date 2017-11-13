@@ -8,7 +8,7 @@ public class ColumnFactory {
         if (columnAttributeType.equals("Enum")) {
             return new EnumColumn(s);
         }
-
+        
         return new PlainColumn(s);
     }
 
