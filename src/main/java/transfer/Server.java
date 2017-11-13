@@ -13,11 +13,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface Server extends Remote {
-    DataBase dbRequest() throws RemoteException, NoSuchMethodException, InstantiationException, FileNotFoundException, IllegalAccessException, InvocationTargetException, ClassNotFoundException;
-    Table tableRequest(String tableName) throws RemoteException;
-    void createTable(String tableName, ArrayList<Column> currColumns) throws RemoteException;
-    void deleteTable(String tableName) throws RemoteException;
-    Table search(String tableName, ArrayList<String> fieldsSearch) throws RemoteException;
-    void addNewRow(String tableName, ArrayList<Attribute> attributes) throws RemoteException;
-    void editCell(String tableName, int rowId, int columnId, String value) throws RemoteException, IllegalAccessException, InstantiationException, InvocationTargetException;
+    String dbRequest() throws RemoteException, NoSuchMethodException, InstantiationException, FileNotFoundException, IllegalAccessException, InvocationTargetException, ClassNotFoundException;
+    String tableRequest(String tableName) throws RemoteException;
+    void createTable(String str) throws RemoteException;
+    String search(String tableName, String fieldsSearchStr) throws RemoteException;
+    void addNewRow(String tableName, String attributesStr) throws RemoteException;
 }
