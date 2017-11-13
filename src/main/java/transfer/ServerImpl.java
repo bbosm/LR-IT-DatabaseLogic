@@ -1,75 +1,101 @@
 package transfer;
 
-import db.Column;
-import db.DataBase;
-import db.Row;
-import db.Table;
+import db.*;
 import dbtype.Attribute;
 
 import javax.rmi.PortableRemoteObject;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.rmi.*;
+import java.util.Arrays;
 
 public class ServerImpl
         extends PortableRemoteObject implements Server {
 
+    ServerMaster serverMaster = null;
+
     public ServerImpl() throws RemoteException {
        super();
+       serverMaster = new ServerMaster();
     }
 
-    // ends with File.separator or empty ("") String
-    private final String dbFolderPath = "";
-    private final String dbFileName = "bd.db";
 
-    private DataBase serverDataBase = null;
-
-    public DataBase dbRequest() throws NoSuchMethodException, InstantiationException, FileNotFoundException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
-        if (null == serverDataBase)
-        {
-            serverDataBase = new DataBase(dbFolderPath + dbFileName);
-        }
-        return serverDataBase;
+    public String dbRequest() throws NoSuchMethodException, InstantiationException, FileNotFoundException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+        return serverMaster.getDB().toString();
     }
 
-    public Table tableRequest(String tableName) {
-        return serverDataBase.getTable(tableName);
-    }
-
-    private void saveDb() {
+    public String tableRequest(String tableName) {
         try {
-            serverDataBase.saveToFile();
+            return serverMaster.getTable(tableName).toString();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-        catch (IOException e) {
+        return "";
+    }
+
+    public void createTable(String str) {
+        String[] inputLines = str.split("\\r?\\n");
+
+        String tableName = inputLines[0];
+        ArrayList<Column> columns = new ArrayList<>();
+        for (int i = 1; i < inputLines.length; i++) {
+            try {
+                columns.add(ColumnFactory.createColumn(inputLines[i]));
+            } catch (NoSuchMethodException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            serverMaster.createTable(tableName, columns);
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public void createTable(String tableName, ArrayList<Column> currColumns) {
-        String tableFilePath = dbFolderPath + tableName + ".tb";
-        Table newTable = new Table(tableFilePath, tableName, currColumns);
-        serverDataBase.getTables().put(tableName, newTable);
-        saveDb();
+    public String search(String tableName, String fieldsSearchStr) {
+        ArrayList<String> fieldsSearch = new ArrayList<>(Arrays.asList(fieldsSearchStr.split("\\t")));
+
+        Table searchResult = null;
+        try {
+            searchResult = serverMaster.search(tableName, fieldsSearch);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        StringWriter out = new StringWriter();
+        PrintWriter writer = new PrintWriter(out);
+
+        searchResult.writeToPrintWriter(writer);
+        return out.toString();
     }
 
-    public void deleteTable(String tableName) {
-        serverDataBase.getTables().remove(tableName);
-        saveDb();
-    }
+    public void addNewRow(String tableName, String attributesStr) {
+        String[] inputLines = attributesStr.split("\\r?\\n");
 
-    public Table search(String tableName, ArrayList<String> fieldsSearch) {
-        return serverDataBase.getTable(tableName).search(fieldsSearch);
-    }
+        Table table = null;
+        try {
+            table = serverMaster.getTable(tableName);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-    public void addNewRow(String tableName, ArrayList<Attribute> attributes) {
-        serverDataBase.getTable(tableName).getRows().add(new Row(attributes));
-        saveDb();
-    }
+        ArrayList<Attribute> attributes = new ArrayList<>(inputLines.length);
+        for (int i = 0; i < inputLines.length; i++) {
+            try {
+                attributes.add(table.constructField(i, inputLines[i]));
+            } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                e.printStackTrace();
+            }
+        }
 
-    public void editCell(String tableName, int rowId, int columnId, String value) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        serverDataBase.getTable(tableName).setCell(rowId, columnId, value);
-        saveDb();
+        try {
+            serverMaster.addNewRow(tableName, attributes);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
