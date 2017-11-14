@@ -24,7 +24,7 @@ public class ServerImpl
     }
 
 
-    public String dbRequest() throws NoSuchMethodException, InstantiationException, FileNotFoundException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+    public String dbRequest() {
         StringWriter out = new StringWriter();
         PrintWriter writer = new PrintWriter(out);
 
