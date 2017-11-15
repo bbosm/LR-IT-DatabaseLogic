@@ -21,18 +21,18 @@ public class ClientRMI {
     private static Server server = null;
 
     static final String CONTEXT_NAME = "java.naming.factory.initial";
-    static final String IIOP_STRING  = "com.sun.jndi.cosnaming.CNCtxFactory";
+    static final String IIOP_CONTEXT_NAME  = "com.sun.jndi.cosnaming.CNCtxFactory";
 
     static final String URL_NAME = "java.naming.provider.url";
-    static final String IIOP_URL_STRING  = "iiop://localhost:8080";
+    static final String IIOP_URL_NAME  = "iiop://localhost:8080";
 
     static final String OBJECT_NAME = "SERVER";
 
     public static void init() {
         try {
             Properties iiopProperties = new Properties();
-            iiopProperties.put(CONTEXT_NAME, IIOP_STRING);
-            iiopProperties.put(URL_NAME, IIOP_URL_STRING);
+            iiopProperties.put(CONTEXT_NAME, IIOP_CONTEXT_NAME);
+            iiopProperties.put(URL_NAME, IIOP_URL_NAME);
             InitialContext iiopContext = new InitialContext(iiopProperties);
 
             server = (Server)PortableRemoteObject.narrow(iiopContext.lookup(OBJECT_NAME), Server.class);
@@ -42,67 +42,18 @@ public class ClientRMI {
         }
     }
 
-    public static void updateDB() throws RemoteException, InvocationTargetException, InstantiationException, FileNotFoundException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException {
-        ArrayList<String> tableNames = new ArrayList<>();
+    public static void updateDB() throws RemoteException {
         String response = server.dbRequest();
-        String[] responseLines = response.split("\\n");
-
-        String inputLine = responseLines[0];
-        int numberOfTables = Integer.parseInt(inputLine);
-
-        for (int i = 0; i < numberOfTables; i++) {
-            inputLine = responseLines[i + 1];
-
-            int indexBegin = inputLine.lastIndexOf("/");
-            if (indexBegin == -1) {
-                indexBegin = inputLine.lastIndexOf("\\");
-            }
-            if (indexBegin == -1) {
-                indexBegin = 0;
-            }
-            int indexEnd = inputLine.length() - ".tb".length();
-
-            String tableName = inputLine.substring(indexBegin, indexEnd);
-            tableNames.add(tableName);
-        }
-
-        clientDataBase = new DataBase(null, new HashMap<>());
-
-        for(String tableName : tableNames) {
-            String tableStr = server.tableRequest(tableName);
-
-            // convert String into InputStream
-            InputStream is = new ByteArrayInputStream(tableStr.getBytes());
-
-            // read it with BufferedReader
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            try {
-                Table table = new Table(br);
-                clientDataBase.getTables().put(tableName, table);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        clientDataBase = new DataBase(response);
+        for (Table table : clientDataBase.getTables().values()) {
+            Table newTable = new Table(server.tableRequest(table.getName()));
+            clientDataBase.getTables().put(table.getName(), newTable);
         }
     }
 
-    public static void createTable(String tableName, ArrayList<Column> currColumns) {
-        System.out.println(currColumns);
-        Table table = new Table(null, tableName, currColumns);
-
-        StringWriter out = new StringWriter();
-        PrintWriter writer = new PrintWriter(out);
-
-        try {
-            table.writeToPrintWriter(writer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            server.createTable(out.toString());
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+    public static void createTable(String tableName, ArrayList<Column> currColumns) throws RemoteException {
+        Table table = new Table(tableName, currColumns);
+        server.createTable(table.toString());
     }
 
     public static Table search(String tableName, ArrayList<String> fieldsSearch) {
@@ -115,34 +66,18 @@ public class ClientRMI {
             e.printStackTrace();
         }
 
-        // convert String into InputStream
-        InputStream is = new ByteArrayInputStream(response.getBytes());
-
-        // read it with BufferedReader
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        Table table = null;
-        try {
-            table = new Table(br);
-            clientDataBase.getTables().put(tableName, table);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Table table = new Table(response);
+        clientDataBase.getTables().put(tableName, table);
         return table;
     }
 
-    public static void addNewRow(String tableName, ArrayList<Attribute> attributes) {
+    public static void addNewRow(String tableName, ArrayList<Attribute> attributes) throws RemoteException {
         StringBuilder sb = new StringBuilder();
         for (Attribute attribute : attributes) {
             sb.append(attribute.toFile() + "\t");
         }
 
-        String attributesStr = sb.toString();
-
-        try {
-            server.addNewRow(tableName, attributesStr);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        server.addNewRow(tableName, sb.toString());
     }
 
     public static DataBase getClientDataBase() {
