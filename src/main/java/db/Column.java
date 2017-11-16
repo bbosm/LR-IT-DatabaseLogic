@@ -7,7 +7,7 @@ public class Column implements Serializable {
     private String attributeShortTypeName;
     private String name;
 
-    public Column(String s) throws NoSuchMethodException, ClassNotFoundException {
+    public Column(String s) {
         String[] columnsFields = s.split("\\t");
         this.attributeShortTypeName = columnsFields[0];
         this.name = columnsFields[1];

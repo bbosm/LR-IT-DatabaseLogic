@@ -18,58 +18,46 @@ public class ServerMaster {
 
     protected DataBase serverDataBase = null;
 
-    public DataBase getDB() throws FileNotFoundException {
+    public DataBase getDB() {
         if (null == serverDataBase)
         {
-            try {
-                serverDataBase = new DataBase(dbFolderPath + dbFileName);
-            } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException
-                    | IllegalAccessException e) {
-                throw new FileNotFoundException();
-            }
+            serverDataBase = new DataBase(dbFolderPath, dbFileName);
         }
         return serverDataBase;
     }
 
-    public Table getTable(String tableName) throws FileNotFoundException {
+    public Table getTable(String tableName) {
         return serverDataBase.getTable(tableName);
     }
 
-    protected void saveDb() throws FileNotFoundException {
-        try {
-            serverDataBase.saveToFile();
-        } catch (IOException e) {
-            throw new FileNotFoundException();
-        }
+    public void createTable(String fileStr) {
+        Table table = new Table(fileStr);
+        serverDataBase.getTables().put(table.getName(), table);
+        serverDataBase.saveToFile(dbFolderPath, table.getName() + ".tb");
     }
 
-    public void createTable(String tableName, ArrayList<Column> currColumns) throws FileNotFoundException {
-        String tableFilePath = dbFolderPath + tableName + ".tb";
-        Table newTable = new Table(tableFilePath, tableName, currColumns);
-        serverDataBase.getTables().put(tableName, newTable);
-        saveDb();
-    }
+//    public void deleteTable(String tableName) throws FileNotFoundException {
+//        serverDataBase.getTables().remove(tableName);
+//        saveDb();
+//    }
 
-    public void deleteTable(String tableName) throws FileNotFoundException {
-        serverDataBase.getTables().remove(tableName);
-        saveDb();
-    }
-
-    public Table search(String tableName, ArrayList<String> fieldsSearch) throws FileNotFoundException {
+    public Table search(String tableName, ArrayList<String> fieldsSearch) {
         return serverDataBase.getTable(tableName).search(fieldsSearch);
     }
 
-    public void addNewRow(String tableName, ArrayList<Attribute> attributes) throws FileNotFoundException {
-        serverDataBase.getTable(tableName).getRows().add(new Row(attributes));
-        saveDb();
+    public void addNewRow(String tableName, ArrayList<String> attributesStrings) {
+        Table table = serverDataBase.getTable(tableName);
+        ArrayList<Attribute> attributes = new ArrayList<>(table.getColumns().size());
+        for (int i = 0; i < table.getColumns().size(); i++) {
+            attributes.add(table.constructField(i, attributesStrings.get(i)));
+        }
+
+        table.getRows().add(new Row(attributes));
+        table.saveToFile(dbFolderPath, table.getName() + ".tb");
     }
 
-    public void editCell(String tableName, int rowId, int columnId, String value) throws FileNotFoundException {
-        try {
-            serverDataBase.getTable(tableName).setCell(rowId, columnId, value);
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            throw new FileNotFoundException();
-        }
-        saveDb();
-    }
+//    public void editCell(String tableName, int rowId, int columnId, String value) {
+//        serverDataBase.getTable(tableName).setCell(rowId, columnId, value);
+//        serverDataBase.getTable(tableName).saveToFile();
+//    }
 }

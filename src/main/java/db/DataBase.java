@@ -2,97 +2,72 @@ package db;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DataBase implements Serializable {
-    private String pathToFile;
     private HashMap<String, Table> tables;
 
-    public DataBase(String pathToFile) throws
-            ClassNotFoundException,
-            NoSuchMethodException,
-            InvocationTargetException,
-            InstantiationException,
-            IllegalAccessException,
-            FileNotFoundException {
-        this.pathToFile = pathToFile;
+    public DataBase(String fileStr) {
+        this.fromString(fileStr);
+    }
 
-        try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
-            this.readFromBufferedReader(br);
+    public DataBase(String folder, String filename) {
+        try (BufferedReader br = new BufferedReader(new FileReader(folder + filename))) {
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while( (line = br.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+
+            this.fromString(stringBuilder.toString());
         } catch (IOException e) {
             tables = new HashMap<>(0);
-            try {
-                this.saveToFile();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            this.saveToFile(folder, filename);
         }
     }
 
-    public DataBase(BufferedReader br) throws
-            ClassNotFoundException,
-            NoSuchMethodException,
-            InvocationTargetException,
-            InstantiationException,
-            IllegalAccessException,
-            IOException {
-        this.readFromBufferedReader(br);
-    }
+    private void fromString(String fileStr) {
+        String[] fileLines = fileStr.split("(\\r\\n|\\r|\\n)+");
 
-    private void readFromBufferedReader(BufferedReader br) throws
-            ClassNotFoundException,
-            NoSuchMethodException,
-            InvocationTargetException,
-            InstantiationException,
-            IllegalAccessException,
-            IOException {
         // first line
-        int tablesSize = Integer.parseInt(br.readLine());
+        int tablesSize = Integer.parseInt(fileLines[0]);
 
         // other lines
         tables = new HashMap<>(tablesSize);
         for (int tableId = 0; tableId < tablesSize; tableId++) {
-            String tableFilePath = br.readLine();
-            Table table = new Table(tableFilePath);
+            Table table = new Table(fileLines[tableId + 1], (ArrayList<Column>) null);
             tables.put(table.getName(), table);
         }
     }
 
-    public void writeToPrintWriter(PrintWriter out) throws IOException {
+    @Override
+    public String toString() {
+        StringBuilder out = new StringBuilder();
         // firat line
-        out.println(tables.size());
+        out.append(tables.size() + System.lineSeparator());
 
         // table lines
         for (Table table : tables.values()) {
-            out.println(table.getPathToFile());
+            out.append(table.getName() + System.lineSeparator());
         }
+        return out.toString();
     }
 
-    public void saveToFile(String pathToFile) throws IOException {
-        this.pathToFile = pathToFile;
-
-        try(PrintWriter out = new PrintWriter(new FileWriter(pathToFile))) {
-            this.writeToPrintWriter(out);
-        }
-        catch (Exception e) {
-            System.out.println(e.toString());
+    public void saveToFile(String folder, String filename) {
+        try(PrintWriter out = new PrintWriter(new FileWriter(folder + filename))) {
+            out.print(this.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         for (Table table : tables.values()) {
-            table.saveToFile();
+            table.saveToFile(folder, table.getName() + ".tb");
         }
-    }
-
-    public void saveToFile() throws IOException {
-        saveToFile(this.pathToFile);
     }
 
     public Table getTable(String name) {
        return tables.get(name);
-    }
-
-    public String getPathToFile() {
-        return pathToFile;
     }
 
     public HashMap<String, Table> getTables() {

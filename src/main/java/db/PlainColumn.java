@@ -11,27 +11,31 @@ public class PlainColumn extends Column {
 
     private transient Constructor stringConstructor;
 
-    private void writeObject(ObjectOutputStream stream)
-            throws IOException {
+    private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
     }
 
-    private void readObject(ObjectInputStream stream)
-            throws IOException, ClassNotFoundException, NoSuchMethodException {
-        stream.defaultReadObject();
+    private void readObject(ObjectInputStream stream) throws IOException {
+        try {
+            stream.defaultReadObject();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         start();
     }
 
-    public PlainColumn(String s) throws
-            NoSuchMethodException,
-            ClassNotFoundException {
+    public PlainColumn(String s) {
         super(s);
         start();
     }
 
-    private void start() throws ClassNotFoundException, NoSuchMethodException {
-        this.stringConstructor = Class.forName(
-                Attribute.getFullTypeName(getAttributeShortTypeName())).getConstructor(String.class);
+    private void start() {
+        try {
+            this.stringConstructor = Class.forName(
+                    Attribute.getFullTypeName(getAttributeShortTypeName())).getConstructor(String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

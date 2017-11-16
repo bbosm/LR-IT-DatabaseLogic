@@ -24,105 +24,26 @@ public class ServerImpl
     }
 
 
-    public String dbRequest() {
-        StringWriter out = new StringWriter();
-        PrintWriter writer = new PrintWriter(out);
-
-        try {
-            serverMaster.getDB().writeToPrintWriter(writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return out.toString();
+    public String dbRequest() throws RemoteException {
+        return serverMaster.getDB().toString();
     }
 
-    public String tableRequest(String tableName) {
-        StringWriter out = new StringWriter();
-        PrintWriter writer = new PrintWriter(out);
-
-        try {
-            serverMaster.getTable(tableName).writeToPrintWriter(writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return out.toString();
+    public String tableRequest(String tableName) throws RemoteException {
+        return serverMaster.getTable(tableName).toString();
     }
 
-    public void createTable(String str) {
-        String[] inputLines = str.split("\\n");
-
-        // first line
-        String tableName = inputLines[0];
-
-        // second line
-        int rowsSize = 0, columnsSize = 0;
-        String sCurrentLine = inputLines[1];
-        String[] firstLineParameters = sCurrentLine.split("\\s+");
-        rowsSize = Integer.parseInt(firstLineParameters[0]);
-        columnsSize = Integer.parseInt(firstLineParameters[1]);
-
-        // column lines
-        ArrayList<Column> columns = new ArrayList<>(columnsSize);
-        for (int columnId = 0; columnId < columnsSize; columnId++) {
-            sCurrentLine = inputLines[columnId + 2];
-            try {
-                columns.add(ColumnFactory.createColumn(sCurrentLine));
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            serverMaster.createTable(tableName, columns);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    public void createTable(String fileStr) throws RemoteException {
+        serverMaster.createTable(fileStr);
     }
 
-    public String search(String tableName, String fieldsSearchStr) {
+    public String search(String tableName, String fieldsSearchStr) throws RemoteException {
         ArrayList<String> fieldsSearch = new ArrayList<>(Arrays.asList(fieldsSearchStr.split("\\t")));
-
-        Table searchResult = null;
-        try {
-            searchResult = serverMaster.search(tableName, fieldsSearch);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        StringWriter out = new StringWriter();
-        PrintWriter writer = new PrintWriter(out);
-
-        searchResult.writeToPrintWriter(writer);
-        return out.toString();
+        Table searchResult = serverMaster.search(tableName, fieldsSearch);
+        return searchResult.toString();
     }
 
-    public void addNewRow(String tableName, String attributesStr) {
-        String[] inputLines = attributesStr.split("\\r?\\n");
-
-        Table table = null;
-        try {
-            table = serverMaster.getTable(tableName);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        ArrayList<Attribute> attributes = new ArrayList<>(inputLines.length);
-        for (int i = 0; i < inputLines.length; i++) {
-            try {
-                attributes.add(table.constructField(i, inputLines[i]));
-            } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            serverMaster.addNewRow(tableName, attributes);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    public void addNewRow(String tableName, String attributesStr) throws RemoteException {
+        ArrayList<String> attributes = new ArrayList<>(Arrays.asList(attributesStr.split("\\t")));
+        serverMaster.addNewRow(tableName, attributes);
     }
 }
