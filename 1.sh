@@ -1,8 +1,4 @@
 #!/bin/bash
 
-#tnameserv -ORBInitialPort 8080
-
-cd build/classes/java/main
-rmic -iiop transfer.ServerImpl
-
-
+cd src/main/java
+idlj -i /usr/lib/jvm/java-8-openjdk-amd64/lib -fall transfer/Server.idl

@@ -1,5 +1,11 @@
 package app;
 
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
 import transfer.*;
 
 import javax.naming.InitialContext;
@@ -7,29 +13,35 @@ import java.util.Properties;
 
 public class ServerApp {
 
-    static final String CONTEXT_NAME = "java.naming.factory.initial";
-    static final String IIOP_STRING  = "com.sun.jndi.cosnaming.CNCtxFactory";
-
-    static final String URL_NAME = "java.naming.provider.url";
-    static final String IIOP_URL_STRING  = "iiop://localhost:8080";
-
     static final String OBJECT_NAME = "SERVER";
+    static final String ORB_PORT = "8080";
+
+    static final String SERVICE_NAME = "NameService";
 
     public static void main(String[] args) throws Exception {
 
         try {
-            ServerImpl server = new ServerImpl();
+            Properties props = new Properties();
+            props.put("org.omg.CORBA.ORBInitialPort", ORB_PORT);
+            ORB orb = ORB.init(args, props);
 
-            // Create the IIOP Initial Context
-            Properties iiopProperties = new Properties();
-            iiopProperties.put(CONTEXT_NAME, IIOP_STRING);
-            iiopProperties.put(URL_NAME, IIOP_URL_STRING);
-            InitialContext iiopContext = new InitialContext(iiopProperties);
+            POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+            rootPOA.the_POAManager().activate();
 
-            // Bind the object to the IIOP registry
-            iiopContext.rebind(OBJECT_NAME, server);
+            ServerImpl serverImpl = new ServerImpl();
 
-            System.out.println("RMI(IIOP) Server ready...");
+            org.omg.CORBA.Object ref = rootPOA.servant_to_reference(serverImpl);
+            Server href = ServerHelper.narrow(ref);
+
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references(SERVICE_NAME);
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            NameComponent path[] = ncRef.to_name(OBJECT_NAME);
+            ncRef.rebind(path, href);
+
+            System.out.println("CORBAServer ready and waiting ...");
+
+            orb.run();
         }
         catch (Exception e) {
             e.printStackTrace();

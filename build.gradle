@@ -5,16 +5,18 @@ apply plugin: 'application'
 mainClassName = 'app.ServerApp'
 sourceCompatibility = 1.8
 
-
 repositories {
     mavenCentral()
 }
 
-run {
-   doFirst {
+compileJava {
+    doFirst {
         exec {
             executable './1.sh'
         }
     }
-	systemProperties 'java.security.policy' : file("policy.all")
+}
+
+run {
+    systemProperties 'java.security.policy' : file("policy.all")
 }
