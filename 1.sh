@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd build/classes/main
-rmic -iiop transfer.Server
+cd src/main/java
+idlj -i /usr/lib/jvm/java-8-openjdk-amd64/lib -fclient transfer/Server.idl
 
 

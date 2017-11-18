@@ -4,6 +4,10 @@ import db.Column;
 import db.DataBase;
 import db.Table;
 import dbtype.Attribute;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
 
 import javax.naming.InitialContext;
 import javax.rmi.PortableRemoteObject;
@@ -20,22 +24,26 @@ public class ClientRMI {
     private static DataBase clientDataBase = null;
     private static Server server = null;
 
-    static final String CONTEXT_NAME = "java.naming.factory.initial";
-    static final String IIOP_CONTEXT_NAME  = "com.sun.jndi.cosnaming.CNCtxFactory";
-
-    static final String URL_NAME = "java.naming.provider.url";
-    static final String IIOP_URL_NAME  = "iiop://localhost:8080";
+    static final String SERVICE_NAME = "NameService";
+    static final String ORB_PORT = "8080";
 
     static final String OBJECT_NAME = "SERVER";
 
     public static void init() {
         try {
-            Properties iiopProperties = new Properties();
-            iiopProperties.put(CONTEXT_NAME, IIOP_CONTEXT_NAME);
-            iiopProperties.put(URL_NAME, IIOP_URL_NAME);
-            InitialContext iiopContext = new InitialContext(iiopProperties);
+            String[] args = {};
+            Properties props = new Properties();
+            props.put("org.omg.CORBA.ORBInitialPort", ORB_PORT);
 
-            server = (Server)PortableRemoteObject.narrow(iiopContext.lookup(OBJECT_NAME), Server.class);
+            ORB orb = ORB.init(args, props);
+            org.omg.CORBA.Object object = orb.resolve_initial_references(SERVICE_NAME);
+            NamingContext context = NamingContextHelper.narrow(object);
+            System.out.println ("The ORB has been created and initialized ...");
+
+            NameComponent component = new NameComponent(OBJECT_NAME, "");
+            NameComponent[] path = {component};
+            server = ServerHelper.narrow(context.resolve(path));
+            System.out.println ("The Object Reference has been resolved in Naming ...");
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -62,7 +70,7 @@ public class ClientRMI {
         String response = null;
         try {
             response = server.search(tableName, fieldsSearchStr);
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
