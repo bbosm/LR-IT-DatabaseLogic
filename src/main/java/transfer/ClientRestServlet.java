@@ -10,22 +10,15 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ClientRestServlet extends Client {
+public class ClientRestServlet extends ClientMaster {
     private final String linkToServer = "http://localhost:8080/mydb/rest";
 
-    public ClientRestServlet() {
-        super();
-    }
-
-    private int sendRequest(HttpURLConnection connection, String requestMethod, String requestString) throws ConnectException {
+    private int sendRequest(HttpURLConnection connection, String requestMethod, String requestString) {
         try {
             connection.setRequestMethod(requestMethod);
         } catch (ProtocolException e) {
-            throw new ConnectException();
+            e.printStackTrace();
         }
-
-        System.out.println(requestMethod + " " + connection.getURL().toString());
-        System.out.println(requestString);
 
         if (requestMethod.equals("GET")) {
             connection.setDoOutput(false);
@@ -35,13 +28,11 @@ public class ClientRestServlet extends Client {
             connection.setRequestProperty("Content-Type", "text/plain");
             connection.setRequestProperty("charset", "utf-8");
 
-            try {
-                DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
                 out.writeBytes(requestString);
                 out.flush();
-                out.close();
             } catch (IOException e) {
-                throw new ConnectException();
+                e.printStackTrace();
             }
         }
 
@@ -54,99 +45,78 @@ public class ClientRestServlet extends Client {
         return responseCode;
     }
 
-    public void updateDB() throws ConnectException {
+    public void updateDB() {
         String requestURL = linkToServer + "/db";
 
-        URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(requestURL);
+            URL url = new URL(requestURL);
             connection = (HttpURLConnection)url.openConnection();
         } catch (IOException e) {
-            throw new ConnectException();
+            e.printStackTrace();
         }
 
         sendRequest(connection, "GET", "");
 
-        ArrayList<String> tableNames = new ArrayList<>();
-        try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String inputLine = in.readLine();
-            int numberOfTables = Integer.parseInt(inputLine);
-
-            for (int i = 0; i < numberOfTables; i++) {
-                inputLine = in.readLine();
-
-                int indexBegin = inputLine.lastIndexOf("/");
-                if (indexBegin == -1) {
-                    indexBegin = inputLine.lastIndexOf("\\");
-                }
-                if (indexBegin == -1) {
-                    indexBegin = 0;
-                }
-                int indexEnd = inputLine.length() - ".tb".length();
-
-                String tableName = inputLine.substring(indexBegin, indexEnd);
-                tableNames.add(tableName);
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            StringBuilder stringBuilder = new StringBuilder();
+            String sCurrentLine;
+            while ((sCurrentLine = in.readLine()) != null) {
+                stringBuilder.append(sCurrentLine + System.lineSeparator());
             }
-        } catch (Exception e) {
-            throw new ConnectException();
+            clientDataBase = new DataBase(stringBuilder.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         connection.disconnect();
 
-        try {
-            clientDataBase = new DataBase(null, new HashMap<>());
-        } catch (Exception e) {
-            throw new ConnectException();
-        }
-
-        for(String tableName : tableNames) {
-            requestURL =  linkToServer + "/db/" + tableName;
+        for(Table table : clientDataBase.getTables().values()) {
+            requestURL =  linkToServer + "/table?tableName=" + table.getName();
             try {
-                url = new URL(requestURL);
+                URL url = new URL(requestURL);
                 connection = (HttpURLConnection)url.openConnection();
             } catch (IOException e) {
-                throw new ConnectException();
+                e.printStackTrace();
             }
+
             sendRequest(connection, "GET", "");
 
-            try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                Table table = new Table(in);
-                clientDataBase.getTables().put(tableName, table);
-            } catch (Exception e) {
-                throw new ConnectException();
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                StringBuilder stringBuilder = new StringBuilder();
+                String sCurrentLine;
+                while ((sCurrentLine = in.readLine()) != null) {
+                    stringBuilder.append(sCurrentLine + System.lineSeparator());
+                }
+                Table responseTable = new Table(stringBuilder.toString());
+                clientDataBase.getTables().put(responseTable.getName(), responseTable);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
             connection.disconnect();
         }
     }
 
-    public void createTable(String tableName, ArrayList<Column> currColumns) throws ConnectException {
-        String requestURL = linkToServer + "/db";
+    public void createTable(String tableName, ArrayList<Column> columns) {
+        String requestURL = linkToServer + "/createTable?tableName=" + tableName;
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(tableName + "\n");
-        for (Column column : currColumns) {
-            stringBuilder.append(column.toString() + "\n");
-        }
-
-        URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(requestURL);
+            URL url = new URL(requestURL);
             connection = (HttpURLConnection)url.openConnection();
         } catch (IOException e) {
-            throw new ConnectException();
+            e.printStackTrace();
         }
 
-        sendRequest(connection, "POST", stringBuilder.toString());
+        sendRequest(connection, "POST", createTableStr(tableName, columns));
 
         connection.disconnect();
     }
 
-    public void deleteTable(String tableName) throws ConnectException {}
+//    public void deleteTable(String tableName) throws ConnectException {}
 
-    public Table search(String tableName, ArrayList<String> fieldsSearch) throws ConnectException {
+    public Table search(String tableName, ArrayList<String> fieldsSearch) {
         StringBuilder requestURL = new StringBuilder();
         requestURL.append(linkToServer + "/db/" + tableName + "/search");
 
@@ -159,44 +129,48 @@ public class ClientRestServlet extends Client {
             e.printStackTrace();
         }
 
-        URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(requestURL.toString());
+            URL url = new URL(requestURL.toString());
             connection = (HttpURLConnection)url.openConnection();
         } catch (IOException e) {
-            throw new ConnectException();
+            e.printStackTrace();
         }
 
         sendRequest(connection, "GET", "");
 
-        Table table = null;
-        try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            table = new Table(in);
-            clientDataBase.getTables().put(table.getName(), table);
-        } catch (Exception e) {
-            throw new ConnectException();
+        Table responseTable = null;
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            StringBuilder stringBuilder = new StringBuilder();
+            String sCurrentLine;
+            while ((sCurrentLine = in.readLine()) != null) {
+                stringBuilder.append(sCurrentLine + System.lineSeparator());
+            }
+            responseTable = new Table(stringBuilder.toString());
+            clientDataBase.getTables().put(responseTable.getName(), responseTable);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         connection.disconnect();
 
-        return table;
+        return responseTable;
     }
 
-    public void addNewRow(String tableName, ArrayList<Attribute> attributes) throws ConnectException {
+    public void addNewRow(String tableName, ArrayList<Attribute> attributes) {
         String requestURL = linkToServer + "/db/" + tableName;
         StringBuilder stringBuilder = new StringBuilder();
         for (Attribute attribute : attributes) {
-            stringBuilder.append(attribute.toFile() + "\n");
+            stringBuilder.append(attribute.toFile());
+            stringBuilder.append(System.lineSeparator());
         }
 
-        URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(requestURL);
+            URL url = new URL(requestURL);
             connection = (HttpURLConnection)url.openConnection();
         } catch (IOException e) {
-            throw new ConnectException();
+            e.printStackTrace();
         }
 
         sendRequest(connection, "POST", stringBuilder.toString());
@@ -204,16 +178,15 @@ public class ClientRestServlet extends Client {
         connection.disconnect();
     }
 
-    public void editCell(String tableName, int rowId, int columnId, String value) throws ConnectException {
+    public void editCell(String tableName, int rowId, int columnId, String value) {
         String requestURL = linkToServer + "/db/" + tableName;
 
-        URL url = null;
         HttpURLConnection connection = null;
         try {
-            url = new URL(requestURL);
+            URL url = new URL(requestURL);
             connection = (HttpURLConnection)url.openConnection();
         } catch (IOException e) {
-            throw new ConnectException();
+            e.printStackTrace();
         }
 
         sendRequest(connection, "PUT", rowId + "\n" + columnId + "\n" + value);

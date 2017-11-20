@@ -2,7 +2,7 @@ package db;
 
 public class ColumnFactory {
 
-    public static Column createColumn(String s) throws NoSuchMethodException, ClassNotFoundException {
+    public static Column createColumn(String s) {
         String columnAttributeType = s.split("\\t")[0];
 
         if (columnAttributeType.equals("Enum")) {

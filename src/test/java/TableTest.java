@@ -22,19 +22,13 @@ import static org.junit.Assert.assertEquals;
 import java.net.HttpURLConnection;
 
 public class TableTest {
-    String pathToTable = "testTable.tb";
+    String tableFolder = ""; // ends with File.separator or empty ("") String
+    String tableFilename = "testTable.tb";
     private Table table;
     private final int columnsSize = 3;
 
     @Before
-    public void initTable() throws
-            NoSuchMethodException,
-            ClassNotFoundException,
-            IllegalAccessException,
-            InstantiationException,
-            InvocationTargetException,
-            IOException,
-            ParseException {
+    public void initTable() {
 
         ArrayList<Column> columns = new ArrayList<>();
         columns.add(
@@ -47,7 +41,7 @@ public class TableTest {
                 ColumnFactory.createColumn(
                         ColumnFactory.makeEnumColumnString("EnumColumnName", "Red Yellow")));
 
-        table = new Table(pathToTable, "testTable", columns);
+        table = new Table("testTable", columns);
 
         ArrayList<Attribute> row = new ArrayList<>(columnsSize);
         row.add(table.constructField(0, "2017.10.9"));
@@ -172,16 +166,10 @@ public class TableTest {
 
 
     @Test
-    public void fileIO() throws
-            IOException,
-            ClassNotFoundException,
-            NoSuchMethodException,
-            InvocationTargetException,
-            InstantiationException,
-            IllegalAccessException {
-        table.saveToFile();
+    public void fileIO() {
+        table.saveToFile(tableFolder, tableFilename);
 
-        Table table2 = new Table(pathToTable);
+        Table table2 = new Table(tableFolder, tableFilename);
 
         assertEquals("testTable", table2.getName());
         assertEquals(3, table2.getColumns().size());
@@ -218,25 +206,5 @@ public class TableTest {
         assertEquals("6",          table2.getCell(3, 1).toString());
         assertEquals("Red",        table2.getCell(3, 2).toString());
         assertEquals("0",          table2.getCell(3, 2).toFile());
-
-        table2.saveToFile();
-    }
-
-    private static void sendRequest(HttpURLConnection connection, String requestString) throws IOException {
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setInstanceFollowRedirects(false);
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        connection.setRequestProperty("charset", "utf-8");
-        connection.setRequestProperty("Content-Length", Integer.toString(requestString.getBytes().length));
-        connection.setUseCaches(false);
-
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.writeBytes(requestString);
-        out.flush();
-        out.close();
-
-        int tmp = connection.getResponseCode();
     }
 }

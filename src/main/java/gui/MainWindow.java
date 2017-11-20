@@ -4,7 +4,6 @@ import db.Column;
 import db.ColumnFactory;
 import db.Table;
 import dbtype.AttributeEnum;
-import transfer.Client;
 import transfer.ClientLocal;
 
 import dbtype.Attribute;
@@ -22,8 +21,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import transfer.ClientRestServlet;
-import transfer.ClientWebServlet;
+import transfer.ClientMaster;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +33,7 @@ public class MainWindow extends Application {
 
     private TabPane tabPane;
     private ArrayList<Column> currColumns = null;
-    private Client client;
+    private ClientMaster client;
 
     private final ObservableList<String> availableOptions =
             FXCollections.observableArrayList(
@@ -56,7 +54,7 @@ public class MainWindow extends Application {
 
         initUI(verticalLayout);
 
-        client = new ClientRestServlet();
+        client = new ClientLocal();
 
         root.getChildren().add(verticalLayout);
 
@@ -123,11 +121,7 @@ public class MainWindow extends Application {
                             e.printStackTrace();
                         }
 
-                        try {
-                            client.editCell(table.getName(), i, finalJ, newValue);
-                        } catch (ConnectException e) {
-                            e.printStackTrace();
-                        }
+                        client.editCell(table.getName(), i, finalJ, newValue);
                     }
             );
             tableView.getColumns().add(col);
@@ -146,11 +140,7 @@ public class MainWindow extends Application {
 
     private void showDataBase(String currentTableName) {
         removeTabsFromInterface();
-        try {
-            client.updateDB();
-        } catch (ConnectException e) {
-            e.printStackTrace();
-        }
+        client.updateDB();
 
         HashMap<String, Table> tables = client.getClientDataBase().getTables();
 
@@ -185,11 +175,7 @@ public class MainWindow extends Application {
     private void search() {
         String tableName = tabPane.getSelectionModel().getSelectedItem().getText();
 
-        try {
-            client.updateDB();
-        } catch (ConnectException e) {
-            e.printStackTrace();
-        }
+        client.updateDB();
 
         Table currTable = client.getClientDataBase().getTable(tableName);
 
@@ -222,11 +208,7 @@ public class MainWindow extends Application {
             }
 
             Table searchTable = null;
-            try {
-                searchTable = client.search(tableName, fieldsSearch);
-            } catch (ConnectException e1) {
-                e1.printStackTrace();
-            }
+            searchTable = client.search(tableName, fieldsSearch);
             tmpWindow.close();
 
             addTableToInterface(searchTable);
@@ -359,11 +341,7 @@ public class MainWindow extends Application {
                 if (!tableNameTextField.getText().equals("")) {
                     String tableName = tableNameTextField.getText();
 
-                    try {
-                        client.createTable(tableName, currColumns);
-                    } catch (ConnectException e1) {
-                        e1.printStackTrace();
-                    }
+                    client.createTable(tableName, currColumns);
                     newWindow.close();
 
                     showDataBase(tableName);
@@ -429,7 +407,7 @@ public class MainWindow extends Application {
             try {
                 client.addNewRow(tableName, attributes);
                 switchInterfaceToTable(tableName);
-            } catch (ConnectException e1) {
+            } catch (Exception e1) {
                 showErrorMessage(e1.toString());
             }
             newWindow.close();

@@ -7,57 +7,46 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-public class Table {
-    private String pathToFile;
+public class Table implements Serializable {
     private String name;
     private ArrayList<Row> rows;
     private ArrayList<Column> columns;
 
-    public Table(String pathToFile, String name, ArrayList<Column> columns) {
-        this.pathToFile = pathToFile;
+    public Table(String fileStr) {
+        this.fromString(fileStr);
+    }
+
+    public Table(String folder, String filename) {
+        try (BufferedReader br = new BufferedReader(new FileReader(folder + filename))) {
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while( (line = br.readLine()) != null) {
+                stringBuilder.append(line);
+                stringBuilder.append(System.lineSeparator());
+            }
+
+            this.fromString(stringBuilder.toString());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Table(String name, ArrayList<Column> columns) {
         this.name = name;
         this.rows = new ArrayList<>();
         this.columns = columns;
     }
 
-    public Table(String pathToFile) throws
-            ClassNotFoundException,
-            NoSuchMethodException,
-            IllegalAccessException,
-            InvocationTargetException,
-            InstantiationException {
-        this.pathToFile = pathToFile;
+    private void fromString(String fileStr) {
+        String[] fileLines = fileStr.split("(\\r\\n|\\r|\\n)+");
 
-        try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
-            this.readFromBufferedReader(br);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Table(BufferedReader br) throws
-            NoSuchMethodException,
-            IOException,
-            ClassNotFoundException,
-            IllegalAccessException,
-            InvocationTargetException,
-            InstantiationException {
-        this.pathToFile = null;
-
-        this.readFromBufferedReader(br);
-    }
-
-    private void readFromBufferedReader(BufferedReader br) throws
-            IOException,
-            NoSuchMethodException,
-            ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
         // first line
-        this.name = br.readLine();
+        this.name = fileLines[0];
 
         // second line
         int rowsSize = 0, columnsSize = 0;
-        String sCurrentLine = br.readLine();
+        String sCurrentLine = fileLines[1];
         String[] firstLineParameters = sCurrentLine.split("\\s+");
         rowsSize = Integer.parseInt(firstLineParameters[0]);
         columnsSize = Integer.parseInt(firstLineParameters[1]);
@@ -65,60 +54,58 @@ public class Table {
         // column lines
         columns = new ArrayList<>(columnsSize);
         for (int columnId = 0; columnId < columnsSize; columnId++) {
-            sCurrentLine = br.readLine();
+            sCurrentLine = fileLines[2 + columnId];
             columns.add(ColumnFactory.createColumn(sCurrentLine));
         }
 
         // row lines
         rows = new ArrayList<>(rowsSize);
         for (int rowId = 0; rowId < rowsSize; rowId++) {
-            sCurrentLine = br.readLine();
-            String[] rowFields = sCurrentLine.split("\\t");
-            ArrayList<Attribute> rowValues = new ArrayList<>(columnsSize);
-
-            for (int columnId = 0; columnId < columnsSize; columnId++) {
-                rowValues.add(constructField(columnId, rowFields[columnId]));
-            }
-
-            rows.add(new Row(rowValues));
+            sCurrentLine = fileLines[2 + columnsSize + rowId];
+            rows.add(new Row(this, sCurrentLine));
         }
     }
 
-    public void writeToPrintWriter(PrintWriter out) {
+    @Override
+    public String toString() {
+        StringBuilder out = new StringBuilder();
         // first line
-        out.println(name);
+        out.append(name);
+        out.append(System.lineSeparator());
 
         // second line
-        out.println(rows.size() + " " + columns.size());
+        out.append(rows.size());
+        out.append(" ");
+        out.append(columns.size());
+        out.append(System.lineSeparator());
 
         // column lines
         for (Column column : columns) {
             String columnLine = column.toString();
-            out.println(columnLine);
+            out.append(columnLine);
+            out.append(System.lineSeparator());
         }
 
         // row lines
         for (Row row : rows) {
             String rowLine = row.toString();
-            out.println(rowLine);
+            out.append(rowLine);
+            out.append(System.lineSeparator());
         }
+        return out.toString();
     }
 
-    public void saveToFile(String pathToFile) throws IOException {
+    public void saveToFile(String folder, String filename) {
         // TODO: check for not null paths (pathToFile or this.pathToFile)
-        this.pathToFile = pathToFile;
-
-        FileWriter fw = new FileWriter(pathToFile);
-        try(PrintWriter out = new PrintWriter(fw)) {
-            this.writeToPrintWriter(out);
-        }
-        catch (Exception e) {
-            System.out.println(e.toString());
+        try(PrintWriter out = new PrintWriter(new FileWriter(folder + filename))) {
+            out.print(this.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     public Table search(ArrayList<String> fieldsSearch) {
-        Table result = new Table(null, "Search in " + getName(), getColumns());
+        Table result = new Table("Search in " + getName(), getColumns());
         for (int i = 0; i < getRows().size(); ++i) {
             boolean add = true;
             Row tmpRow = getRows().get(i);
@@ -138,23 +125,22 @@ public class Table {
         return result;
     }
 
-    public Attribute constructField(int columnNumber, String s) throws
-            IllegalAccessException,
-            InvocationTargetException,
-            InstantiationException {
-        Column currColumn = columns.get(columnNumber);
+    public Attribute constructField(int columnNumber, String s) {
+        Column column = columns.get(columnNumber);
 
-        if (currColumn.getAttributeShortTypeName().equals("Enum")) {
-            return new AttributeEnum(s, currColumn);
+        if (column.getAttributeShortTypeName().equals("Enum")) {
+            return new AttributeEnum(s, column);
         }
 
-        return (Attribute)currColumn.getStringConstructor().newInstance(s);
+        try {
+            return (Attribute)column.getStringConstructor().newInstance(s);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public void setCell(int rowNumber, int columnNumber, String s) throws
-            IllegalAccessException,
-            InvocationTargetException,
-            InstantiationException {
+    public void setCell(int rowNumber, int columnNumber, String s) {
         rows.get(rowNumber).set(columnNumber, constructField(columnNumber, s));
     }
 
@@ -168,10 +154,6 @@ public class Table {
         rows.add(row);
     }
 
-    public void saveToFile() throws IOException {
-        saveToFile(this.pathToFile);
-    }
-
     public String getName() {
         return name;
     }
@@ -182,9 +164,5 @@ public class Table {
 
     public ArrayList<Column> getColumns() {
         return columns;
-    }
-
-    public String getPathToFile() {
-        return pathToFile;
     }
 }

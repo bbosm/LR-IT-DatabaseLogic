@@ -5,66 +5,46 @@ import db.DataBase;
 import db.Table;
 import dbtype.Attribute;
 
-import java.io.FileNotFoundException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
 import java.util.ArrayList;
 
-public class ClientLocal extends Client {
-    private Server server;
+public class ClientLocal extends ClientMaster {
+    protected DataBase clientDataBase = null;
+
+    private ServerMaster server;
 
     public ClientLocal() {
-        super();
-        server = new Server();
+        server = new ServerMaster();
     }
 
-    public void updateDB() throws ConnectException {
-        try {
-            clientDataBase = server.getDB();
-        }
-        catch (FileNotFoundException e) {
-            throw new ConnectException();
-        }
-    }
+    public void updateDB() {
+        clientDataBase = new DataBase(server.getDB());
 
-    public void createTable(String tableName, ArrayList<Column> currColumns) throws ConnectException {
-        try {
-            server.createTable(tableName, currColumns);
-        } catch (FileNotFoundException e) {
-            throw new ConnectException();
+        for(Table table : clientDataBase.getTables().values()) {
+            Table responseTable = new Table(server.getTable(table.getName()));
+            clientDataBase.getTables().put(responseTable.getName(), responseTable);
         }
     }
 
-    public void deleteTable(String tableName) throws ConnectException {
-        try {
-            server.deleteTable(tableName);
-        } catch (FileNotFoundException e) {
-            throw new ConnectException();
-        }
+    public void createTable(String tableName, ArrayList<Column> columns) {
+        server.createTable(createTableStr(tableName, columns));
+        updateDB();
     }
 
-    public Table search(String tableName, ArrayList<String> fieldsSearch) throws ConnectException {
-        try {
-            return server.search(tableName, fieldsSearch);
-        } catch (FileNotFoundException e) {
-            throw new ConnectException();
-        }
+//    public void deleteTable(String tableName) throws ConnectException {
+//        server.deleteTable(tableName);
+//        updateDB();
+//    }
+
+    public Table search(String tableName, ArrayList<String> fieldsSearch) {
+        return new Table(server.search(tableName, searchStr(fieldsSearch)));
     }
 
-    public void addNewRow(String tableName, ArrayList<Attribute> attributes) throws ConnectException {
-        try {
-            server.addNewRow(tableName, attributes);
-        } catch (FileNotFoundException e) {
-            throw new ConnectException();
-        }
+    public void addNewRow(String tableName, ArrayList<Attribute> attributes) {
+        server.addNewRow(tableName, addNewRowStr(attributes));
     }
 
-    public void editCell(String tableName, int rowId, int columnId, String value) throws ConnectException {
-        try {
-            server.editCell(tableName, rowId, columnId, value);
-        } catch (FileNotFoundException e) {
-            throw new ConnectException();
-        }
+    public void editCell(String tableName, int rowId, int columnId, String value) {
+        server.editCell(tableName, editCellStr(rowId, columnId, value));
     }
 
     public DataBase getClientDataBase() {
