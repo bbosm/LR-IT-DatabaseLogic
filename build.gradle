@@ -9,11 +9,11 @@ repositories {
 }
 
 compileJava {
-    doFirst {
-        exec {
-            executable './1.sh'
-        }
-    }
+//    doFirst {
+//        exec {
+//            executable './1.sh'
+//        }
+//    }
 }
 
 run {
