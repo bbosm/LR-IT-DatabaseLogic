@@ -9,13 +9,13 @@ repositories {
     mavenCentral()
 }
 
-compileJava {
-    doFirst {
-        exec {
-            executable './1.sh'
-        }
-    }
-}
+//compileJava {
+//    doFirst {
+//        exec {
+//            executable './1.sh'
+//        }
+//    }
+//}
 
 run {
     systemProperties 'java.security.policy' : file("policy.all")
