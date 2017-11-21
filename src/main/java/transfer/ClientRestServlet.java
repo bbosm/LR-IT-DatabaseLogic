@@ -73,7 +73,7 @@ public class ClientRestServlet extends ClientMaster {
         connection.disconnect();
 
         for(Table table : clientDataBase.getTables().values()) {
-            requestURL = linkToServer + "/table?tableName=" + table.getName();
+            requestURL = linkToServer + "/db/" + table.getName();
             try {
                 URL url = new URL(requestURL);
                 connection = (HttpURLConnection)url.openConnection();
@@ -87,7 +87,8 @@ public class ClientRestServlet extends ClientMaster {
                 StringBuilder stringBuilder = new StringBuilder();
                 String sCurrentLine;
                 while ((sCurrentLine = in.readLine()) != null) {
-                    stringBuilder.append(sCurrentLine + System.lineSeparator());
+                    stringBuilder.append(sCurrentLine);
+                    stringBuilder.append(System.lineSeparator());
                 }
                 Table responseTable = new Table(stringBuilder.toString());
                 clientDataBase.getTables().put(responseTable.getName(), responseTable);
@@ -100,7 +101,7 @@ public class ClientRestServlet extends ClientMaster {
     }
 
     public void createTable(String tableName, ArrayList<Column> columns) {
-        String requestURL = linkToServer + "/createTable?tableName=" + tableName;
+        String requestURL = linkToServer + "/db";
 
         HttpURLConnection connection = null;
         try {
@@ -160,11 +161,6 @@ public class ClientRestServlet extends ClientMaster {
 
     public void addNewRow(String tableName, ArrayList<Attribute> attributes) {
         String requestURL = linkToServer + "/db/" + tableName;
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Attribute attribute : attributes) {
-            stringBuilder.append(attribute.toFile());
-            stringBuilder.append(System.lineSeparator());
-        }
 
         HttpURLConnection connection = null;
         try {
@@ -174,7 +170,9 @@ public class ClientRestServlet extends ClientMaster {
             e.printStackTrace();
         }
 
-        sendRequest(connection, "POST", stringBuilder.toString());
+        System.out.println("POST add new row " + addNewRowStr(attributes));
+
+        sendRequest(connection, "POST", addNewRowStr(attributes));
 
         connection.disconnect();
     }
@@ -190,7 +188,7 @@ public class ClientRestServlet extends ClientMaster {
             e.printStackTrace();
         }
 
-        sendRequest(connection, "PUT", rowId + "\n" + columnId + "\n" + value);
+        sendRequest(connection, "PUT", editCellStr(rowId, columnId, value));
 
         connection.disconnect();
     }

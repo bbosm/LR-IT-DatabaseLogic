@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ServerMaster {
-    protected final String dbFolderPath = ""; // ends with File.separator or empty ("") String
+    protected final String dbFolderPath = "D:\\Temp\\"; // ends with File.separator or empty ("") String
     protected final String dbFileName = "bd.db";
 
     protected DataBase serverDataBase = null;
