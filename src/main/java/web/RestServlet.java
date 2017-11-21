@@ -22,21 +22,14 @@ import db.Column;
 import db.ColumnFactory;
 import db.Table;
 import dbtype.Attribute;
-import transfer.Server;
+import transfer.ServerMaster;
 
 @Path("/db")
 public class RestServlet {
-	private static Server server = new Server();
+	private static ServerMaster server = new ServerMaster();
 	
     public RestServlet() {
         super();
-        
-        try {
-			server.getDB();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
     }
     
     @GET
@@ -44,11 +37,7 @@ public class RestServlet {
     @Path("")
     public String getDB() throws IOException {
     	System.out.println("GET db");
-    	StringWriter out = new StringWriter();
-        PrintWriter writer = new PrintWriter(out);
-        
-        server.getDB().writeToPrintWriter(writer);
-    	return out.toString();
+    	return server.getDB().toString();
     }
     
     @GET
@@ -56,11 +45,7 @@ public class RestServlet {
     @Path("/{tableName}")
     public String getTable(@PathParam("tableName") String tableName) throws IOException {
     	System.out.println("GET " + tableName);
-    	StringWriter out = new StringWriter();
-        PrintWriter writer = new PrintWriter(out);
-        
-        server.getTable(tableName).writeToPrintWriter(writer);
-    	return out.toString();
+    	return server.getTable(tableName).toString();
     }
     
     @GET
@@ -70,17 +55,7 @@ public class RestServlet {
     		@PathParam("tableName") String tableName, 
     		@QueryParam("p") final List<String> list) throws IOException {
     	System.out.println("GET " + tableName + "/search");
-    	
-    	ArrayList<String> fieldsSearch = new ArrayList<>(list);
-    	
-    	Table searchResult = null;
-		searchResult = server.search(tableName, fieldsSearch);
-    	
-    	StringWriter out = new StringWriter();
-        PrintWriter writer = new PrintWriter(out);
-        
-        searchResult.writeToPrintWriter(writer);
-    	return out.toString();
+    	return server.search(tableName, String.join("\t", list)).toString();
     }
     
     
@@ -88,45 +63,17 @@ public class RestServlet {
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("")
-    public String createTable(String str) throws IOException {
-		String[] inputLines = str.split("\\r?\\n");
-		
-    	String tableName = inputLines[0];
-    	System.out.println("POST createTable " + tableName);
-		ArrayList<Column> columns = new ArrayList<>();
-		for (int i = 1; i < inputLines.length; i++) {
-			try {
-				columns.add(ColumnFactory.createColumn(inputLines[i]));
-			} catch (NoSuchMethodException | ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		server.createTable(tableName, columns);
-		
-		return "";
+    public void createTable(String str) throws IOException {
+    	System.out.println("POST createTable " + str);
+    	server.createTable(str);
     }
     
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("/{tableName}")
-    public String addNewRow(@PathParam("tableName") String tableName, String str) throws IOException {
+    public void addNewRow(@PathParam("tableName") String tableName, String str) throws IOException {
     	System.out.println("POST addNewRow " + tableName);
-		String[] inputLines = str.split("\\r?\\n");
-		
-		Table table = server.getTable(tableName);
-		ArrayList<Attribute> attributes = new ArrayList<>(inputLines.length);
-		for (int i = 0; i < inputLines.length; i++) {
-			try {
-				attributes.add(table.constructField(i, inputLines[i]));
-			} catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		server.addNewRow(tableName, attributes);
-		
-		return "";
+    	server.addNewRow(tableName, str);
     }
     
     
@@ -134,16 +81,8 @@ public class RestServlet {
     @PUT
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("/{tableName}")
-    public String editCell(@PathParam("tableName") String tableName, String str) throws IOException {
+    public void editCell(@PathParam("tableName") String tableName, String str) throws IOException {
     	System.out.println("PUT editCell " + tableName);
-		String[] inputLines = str.split("\\r?\\n");
-		
-		int rowId = Integer.parseInt(inputLines[0]);
-		int columnId = Integer.parseInt(inputLines[1]);
-		String value = inputLines[2];
-
-		server.editCell(tableName, rowId, columnId, value);
-		
-		return "";
+    	server.editCell(tableName, str);
     }
 }
