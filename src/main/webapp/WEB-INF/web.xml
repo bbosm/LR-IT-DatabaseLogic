@@ -42,26 +42,26 @@
   </servlet>
   <servlet-mapping>
   	<servlet-name>GetTableServlet</servlet-name>
-  	<url-pattern>/GetTableServlet</url-pattern>
+  	<url-pattern>/getTable</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
   	<servlet-name>DBServlet</servlet-name>
-  	<url-pattern>/DBServlet</url-pattern>
+  	<url-pattern>/db</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
   	<servlet-name>CreateTableServlet</servlet-name>
-  	<url-pattern>/CreateTableServlet</url-pattern>
+  	<url-pattern>/createTable</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
   	<servlet-name>SearchServlet</servlet-name>
-  	<url-pattern>/SearchServlet</url-pattern>
+  	<url-pattern>/search</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
   	<servlet-name>AddNewRowServlet</servlet-name>
-  	<url-pattern>/AddNewRowServlet</url-pattern>
+  	<url-pattern>/tableAddRow</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
   	<servlet-name>EditCellServlet</servlet-name>
-  	<url-pattern>/EditCellServlet</url-pattern>
+  	<url-pattern>/tableEdit</url-pattern>
   </servlet-mapping>
 </web-app>

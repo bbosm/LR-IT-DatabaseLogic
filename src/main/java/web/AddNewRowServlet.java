@@ -29,42 +29,20 @@ public class AddNewRowServlet extends HttpServlet {
     }
     
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) {
+    	String tableName = request.getParameter("tableName");
+    	
     	String inputLine;
-		ArrayList<String> values = new ArrayList<>();
+    	StringBuilder stringBuilder = new StringBuilder();
     	try (BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
     		while ((inputLine = br.readLine()) != null) {
-    			values.add(inputLine);
+    			stringBuilder.append(inputLine);
+    			stringBuilder.append(System.lineSeparator());
     		}
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    	
-		String tableName = request.getParameter("tableName");
-		
-		Table table = null;
-		try {
-			table = Common.server.tableRequest(tableName);
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		ArrayList<Attribute> attributes = new ArrayList<>(values.size());
-		for (int i = 0; i < values.size(); i++) {
-			try {
-				attributes.add(table.constructField(i, values.get(i)));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		try {
-			Common.server.addNewRow(tableName, attributes);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+        } catch (IOException e) {
 			e.printStackTrace();
 		}
+    	
+    	Common.server.addNewRow(tableName, stringBuilder.toString());
     }
 
 	/**

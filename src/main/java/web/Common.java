@@ -1,7 +1,7 @@
 package web;
 
-import transfer.Server;
+import transfer.ServerMaster;
 
 public class Common {
-	public static final Server server = new Server();
+	public static final ServerMaster server = new ServerMaster();
 }

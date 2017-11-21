@@ -5,9 +5,7 @@ import java.util.ArrayList;
 public class EnumColumn extends Column {
     private ArrayList<String> values;
 
-    public EnumColumn(String s) throws
-            NoSuchMethodException,
-            ClassNotFoundException {
+    public EnumColumn(String s) {
         super(s);
         String[] columnsEnumValues = s.split("\\t")[2].split("\\s+");
         this.values = new ArrayList<>(columnsEnumValues.length);

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.servlet.ServletException;
@@ -27,35 +28,25 @@ public class SearchServlet extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
     
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response) {
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	String tableName = request.getParameter("tableName");
+    	
     	String inputLine;
-		ArrayList<String> fieldsSearch = new ArrayList<>();
+    	StringBuilder stringBuilder = new StringBuilder();
     	try (BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
     		while ((inputLine = br.readLine()) != null) {
-    			fieldsSearch.add(inputLine);
+    			stringBuilder.append(inputLine);
+    			stringBuilder.append(System.lineSeparator());
     		}
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    	
-		String tableName = request.getParameter("tableName");
-		
-		Table searchResult = null;
-		try {
-			searchResult = Common.server.search(tableName, fieldsSearch);
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		response.setContentType("text/html;charset=UTF-8");
-		try {
-			searchResult.writeToPrintWriter(response.getWriter());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+        } catch (IOException e) {
 			e.printStackTrace();
 		}
+    	
+    	Table result = Common.server.search(tableName, stringBuilder.toString());
+    	
+    	response.setContentType("text/html;charset=UTF-8");
+		PrintWriter out = response.getWriter();
+		out.write(result.toString());
     }
 
 	/**

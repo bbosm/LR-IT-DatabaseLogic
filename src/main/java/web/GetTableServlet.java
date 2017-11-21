@@ -25,11 +25,9 @@ public class GetTableServlet extends HttpServlet {
     
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
     	String tableName = request.getParameter("tableName");
-		Table responseTable = Common.server.tableRequest(tableName);
-		
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
-		responseTable.writeToPrintWriter(out);
+		out.write(Common.server.getTable(tableName).toString());
     }
 
 	/**

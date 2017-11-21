@@ -1,6 +1,8 @@
 package dbtype;
 
-public class Attribute {
+import java.io.Serializable;
+
+public class Attribute implements Serializable {
     private static final String packageTemplate = "dbtype.Attribute";
 
     public Attribute(@SuppressWarnings("unused") String s) {

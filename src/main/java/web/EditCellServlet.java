@@ -25,24 +25,20 @@ public class EditCellServlet extends HttpServlet {
     }
     
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) {
-    	String value = null;
-    	try (BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
-    		value = br.readLine();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+    	String tableName = request.getParameter("tableName");
     	
-		String tableName = request.getParameter("tableName");
-		int rowId = Integer.parseInt(request.getParameter("rowId"));
-		int columnId = Integer.parseInt(request.getParameter("columnId"));
-		
-		try {
-			Common.server.editCell(tableName, rowId, columnId, value);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+    	String inputLine;
+    	StringBuilder stringBuilder = new StringBuilder();
+    	try (BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
+    		while ((inputLine = br.readLine()) != null) {
+    			stringBuilder.append(inputLine);
+    			stringBuilder.append(System.lineSeparator());
+    		}
+        } catch (IOException e) {
 			e.printStackTrace();
 		}
+    	
+    	Common.server.editCell(tableName, stringBuilder.toString());
     }
 
 	/**

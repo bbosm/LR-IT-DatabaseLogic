@@ -29,36 +29,18 @@ public class CreateTableServlet extends HttpServlet {
     }
     
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) {
-    	try {
-			Common.server.dbRequest();
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-    	
     	String inputLine;
-		ArrayList<Column> columns = new ArrayList<>();
+    	StringBuilder stringBuilder = new StringBuilder();
     	try (BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
     		while ((inputLine = br.readLine()) != null) {
-    			try {
-					columns.add(ColumnFactory.createColumn(inputLine));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+    			stringBuilder.append(inputLine);
+    			stringBuilder.append(System.lineSeparator());
     		}
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    	
-		String tableName = request.getParameter("tableName");
-		
-		try {
-			Common.server.createTable(tableName, columns);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+        } catch (IOException e) {
 			e.printStackTrace();
 		}
+    	
+    	Common.server.createTable(stringBuilder.toString());
     }
 
 	/**

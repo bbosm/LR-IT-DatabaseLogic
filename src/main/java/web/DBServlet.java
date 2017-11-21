@@ -1,6 +1,5 @@
 package web;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -14,23 +13,16 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class DBServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
-    /**
-     * Default constructor. 
-     */
-    public DBServlet() {
-    	try {
-			Common.server.dbRequest();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
+	public DBServlet() {
+        super();
+        // TODO Auto-generated constructor stub
     }
     
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
-		Common.server.dbRequest().writeToPrintWriter(out);
+		out.write(Common.server.getDB().toString());
     }
 
 	/**
