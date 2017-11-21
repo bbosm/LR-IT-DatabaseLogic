@@ -11,10 +11,10 @@ repositories {
 }
 
 run {
-   doFirst {
-        exec {
-            executable './1.sh'
-        }
-    }
+//   doFirst {
+//        exec {
+//            executable './1.sh'
+//        }
+//    }
 	systemProperties 'java.security.policy' : file("policy.all")
 }
