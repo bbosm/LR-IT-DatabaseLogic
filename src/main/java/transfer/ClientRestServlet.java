@@ -62,7 +62,8 @@ public class ClientRestServlet extends ClientMaster {
             StringBuilder stringBuilder = new StringBuilder();
             String sCurrentLine;
             while ((sCurrentLine = in.readLine()) != null) {
-                stringBuilder.append(sCurrentLine + System.lineSeparator());
+                stringBuilder.append(sCurrentLine);
+                stringBuilder.append(System.lineSeparator());
             }
             clientDataBase = new DataBase(stringBuilder.toString());
         } catch (IOException e) {
@@ -72,7 +73,7 @@ public class ClientRestServlet extends ClientMaster {
         connection.disconnect();
 
         for(Table table : clientDataBase.getTables().values()) {
-            requestURL =  linkToServer + "/table?tableName=" + table.getName();
+            requestURL = linkToServer + "/table?tableName=" + table.getName();
             try {
                 URL url = new URL(requestURL);
                 connection = (HttpURLConnection)url.openConnection();

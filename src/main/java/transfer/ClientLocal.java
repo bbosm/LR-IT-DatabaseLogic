@@ -17,10 +17,10 @@ public class ClientLocal extends ClientMaster {
     }
 
     public void updateDB() {
-        clientDataBase = new DataBase(server.getDB());
+        clientDataBase = new DataBase(server.getDB().toString());
 
         for(Table table : clientDataBase.getTables().values()) {
-            Table responseTable = new Table(server.getTable(table.getName()));
+            Table responseTable = new Table(server.getTable(table.getName()).toString());
             clientDataBase.getTables().put(responseTable.getName(), responseTable);
         }
     }
@@ -36,7 +36,7 @@ public class ClientLocal extends ClientMaster {
 //    }
 
     public Table search(String tableName, ArrayList<String> fieldsSearch) {
-        return new Table(server.search(tableName, searchStr(fieldsSearch)));
+        return new Table(server.search(tableName, searchStr(fieldsSearch)).toString());
     }
 
     public void addNewRow(String tableName, ArrayList<Attribute> attributes) {

@@ -11,8 +11,8 @@ import java.util.ArrayList;
 
 public class ClientWebServlet extends ClientMaster {
     private final String linkToServer =
-            "http://mydb.us-east-2.elasticbeanstalk.com";
-//            "http://localhost:8080/mydb";
+//            "http://mydb.us-east-2.elasticbeanstalk.com";
+            "http://localhost:8080/mydb";
 
     private int sendRequest(HttpURLConnection connection, String requestMethod, String requestString) {
         try {
@@ -73,7 +73,7 @@ public class ClientWebServlet extends ClientMaster {
         connection.disconnect();
 
         for(Table table : clientDataBase.getTables().values()) {
-            requestURL =  linkToServer + "/table?tableName=" + table.getName();
+            requestURL =  linkToServer + "/getTable?tableName=" + table.getName();
             try {
                 URL url = new URL(requestURL);
                 connection = (HttpURLConnection)url.openConnection();
@@ -100,7 +100,7 @@ public class ClientWebServlet extends ClientMaster {
     }
 
     public void createTable(String tableName, ArrayList<Column> columns) {
-        String requestURL = linkToServer + "/createTable?tableName=" + tableName;
+        String requestURL = linkToServer + "/createTable";
 
         HttpURLConnection connection = null;
         try {

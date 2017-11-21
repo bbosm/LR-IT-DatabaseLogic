@@ -17,12 +17,12 @@ public class ServerMaster {
         serverDataBase = new DataBase(dbFolderPath, dbFileName);
     }
 
-    public String getDB() {
-        return serverDataBase.toString();
+    public DataBase getDB() {
+        return serverDataBase;
     }
 
-    public String getTable(String tableName) {
-        return serverDataBase.getTable(tableName).toString();
+    public Table getTable(String tableName) {
+        return serverDataBase.getTable(tableName);
     }
 
     public void createTable(String fileStr) {
@@ -37,9 +37,9 @@ public class ServerMaster {
 //        serverDataBase.saveToFile(dbFolderPath, dbFileName);
 //    }
 
-    public String search(String tableName, String attributesStr) {
+    public Table search(String tableName, String attributesStr) {
         ArrayList<String> fieldsSearch = new ArrayList<>(Arrays.asList(attributesStr.split("\\t")));
-        return serverDataBase.getTable(tableName).search(fieldsSearch).toString();
+        return serverDataBase.getTable(tableName).search(fieldsSearch);
     }
 
     public void addNewRow(String tableName, String attributesStr) {
