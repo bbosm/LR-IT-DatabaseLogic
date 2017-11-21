@@ -56,7 +56,7 @@ public class MainWindow extends Application {
 
         initUI(verticalLayout);
 
-        client = new ClientRestServlet();
+        client = new ClientLocal();
 
         root.getChildren().add(verticalLayout);
 
